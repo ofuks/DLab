@@ -45,6 +45,6 @@ if __name__ == "__main__":
     deeper_config = json.loads(args.additional_config)
 
     print("Enabling proxy for notebook server for repositories access.")
-    enable_proxy(deeper_config['proxy_host'], deeper_config['proxy_port'])
+    enable_proxy(deeper_config['proxy_host'], deeper_config['proxy_port'], args.os_user)
 
 

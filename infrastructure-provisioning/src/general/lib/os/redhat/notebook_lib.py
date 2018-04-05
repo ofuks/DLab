@@ -30,13 +30,21 @@ from dlab.fab import *
 import os, time
 
 
-def enable_proxy(proxy_host, proxy_port):
+def enable_proxy(proxy_host, proxy_port, os_user):
     try:
         proxy_string = "http://%s:%s" % (proxy_host, proxy_port)
         sudo('sed -i "/^export http_proxy/d" /etc/profile')
         sudo('sed -i "/^export https_proxy/d" /etc/profile')
         sudo('echo export http_proxy=' + proxy_string + ' >> /etc/profile')
         sudo('echo export https_proxy=' + proxy_string + ' >> /etc/profile')
+        notebook_proxy_config_path = "/home/%s/.ipython/profile_default/startup/" % (os_user)
+        if not exists(notebook_proxy_config_path + '00-proxy.py'):
+            run('mkdir -p ' + notebook_proxy_config_path)
+            run('echo import sys,os,os.path >> ' + notebook_proxy_config_path + '00-proxy.py')
+            run('echo \'os.environ["HTTP_PROXY"]="{0}"\' >> {1}00-proxy.py'.format(proxy_string,
+                                                                                    notebook_proxy_config_path))
+            run('echo \'os.environ["HTTPS_PROXY"]="{0}"\' >> {1}00-proxy.py'.format(proxy_string,
+                                                                                    notebook_proxy_config_path))
         if exists('/etc/yum.conf'):
             sudo('sed -i "/^proxy=/d" /etc/yum.conf')
         sudo("echo 'proxy={}' >> /etc/yum.conf".format(proxy_string))
