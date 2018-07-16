@@ -21,6 +21,7 @@
 from dlab.meta_lib import *
 from dlab.actions_lib import *
 import boto3
+import os
 import argparse
 import sys
 from dlab.ssn_lib import *
@@ -67,6 +68,10 @@ if __name__ == "__main__":
         remove_ec2(args.tag_name, '*')
     except:
         sys.exit(1)
+
+    print("Removing Route53 records")
+    remove_route_53_record(os.environ['ssn_hosted_zone_id'], os.environ['ssn_hosted_zone_name'],
+                           os.environ['ssn_subdomain'])
 
     print("Removing security groups")
     try:

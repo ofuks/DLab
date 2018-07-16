@@ -88,6 +88,43 @@ def create_s3_bucket(bucket_name, tag, region):
         traceback.print_exc(file=sys.stdout)
 
 
+def set_bucket_policy(bucket_name, region):
+    try:
+        s3_service_name = 'com.amazonaws.{}.s3'.format(region)
+        vpc_endpoint_id = meta_lib.get_vpc_endpoints(os.environ['aws_vpc_id'], s3_service_name)[0].get('VpcEndpointId')
+        s3 = boto3.client('s3')
+        bucket_policy = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Access-from-specific-VPCendpoint-only",
+                    "Effect": "Deny",
+                    "Principal": "*",
+                    "Action": "s3:*",
+                    "Resource": [
+                        "arn:aws:s3:::{}/*".format(bucket_name),
+                        "arn:aws:s3:::{}".format(bucket_name)
+                    ],
+                    "Condition": {
+                        "StringNotEquals": {
+                            "aws:sourceVpce": vpc_endpoint_id
+                        }
+                    }
+                }
+            ]
+        }
+        bucket_policy = json.dumps(bucket_policy)
+        s3.put_bucket_policy(
+            Bucket=bucket_name,
+            ConfirmRemoveSelfBucketAccess=True,
+            Policy=bucket_policy
+        )
+    except Exception as err:
+        logging.info("Unable to set S3 bucket policy: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
+        append_result(str({"error": "Unable to set S3 bucket policy", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+        traceback.print_exc(file=sys.stdout)
+
+
 def create_vpc(vpc_cidr, tag):
     try:
         ec2 = boto3.resource('ec2')
@@ -264,6 +301,7 @@ def create_instance(definitions, instance_tag, primary_disk_size=12):
                                                      "DeviceName": "/dev/sdb",
                                                      "Ebs":
                                                          {
+                                                             'Encrypted': True,
                                                              "VolumeSize": int(definitions.instance_disk_size)
                                                          }
                                                  }],
@@ -416,6 +454,71 @@ def create_attach_policy(policy_name, role_name, file_path):
     except Exception as err:
         logging.info("Unable to attach Policy: " + str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout))
         append_result(str({"error": "Unable to attach Policy", "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+        traceback.print_exc(file=sys.stdout)
+
+
+def create_route_53_record(hosted_zone_id, hosted_zone_name, subdomain, ip_address):
+    try:
+        client = boto3.client('route53')
+        client.change_resource_record_sets(
+            HostedZoneId=hosted_zone_id,
+            ChangeBatch={
+                'Changes': [
+                    {
+                        'Action': 'CREATE',
+                        'ResourceRecordSet': {
+                            'Name': "{}.{}".format(subdomain, hosted_zone_name),
+                            'Type': 'A',
+                            'TTL': 300,
+                            'ResourceRecords': [
+                                {
+                                    'Value': ip_address
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        )
+    except Exception as err:
+        logging.info("Unable to create Route53 record: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        append_result(str({"error": "Unable to create Route53 record",
+                           "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
+        traceback.print_exc(file=sys.stdout)
+
+
+def remove_route_53_record(hosted_zone_id, hosted_zone_name, subdomain):
+    try:
+        client = boto3.client('route53')
+        for record_set in client.list_resource_record_sets(HostedZoneId=hosted_zone_id).get('ResourceRecordSets'):
+            if record_set['Name'] == "{}.{}.".format(subdomain, hosted_zone_name):
+                for record in record_set['ResourceRecords']:
+                    client.change_resource_record_sets(
+                        HostedZoneId=hosted_zone_id,
+                        ChangeBatch={
+                            'Changes': [
+                                {
+                                    'Action': 'DELETE',
+                                    'ResourceRecordSet': {
+                                        'Name': record_set['Name'],
+                                        'Type': 'A',
+                                        'TTL': 300,
+                                        'ResourceRecords': [
+                                            {
+                                                'Value': record['Value']
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    )
+    except Exception as err:
+        logging.info("Unable to remove Route53 record: " + str(err) + "\n Traceback: " + traceback.print_exc(
+            file=sys.stdout))
+        append_result(str({"error": "Unable to remove Route53 record",
+                           "error_message": str(err) + "\n Traceback: " + traceback.print_exc(file=sys.stdout)}))
         traceback.print_exc(file=sys.stdout)
 
 

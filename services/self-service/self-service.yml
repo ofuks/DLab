@@ -98,7 +98,7 @@ mongoMigrationEnabled: false
 logging:
   level: INFO
   loggers:
-    com.epam: TRACE
+    com.epam: INFO
   appenders:
 <#if DEV_MODE == "true">
     - type: console

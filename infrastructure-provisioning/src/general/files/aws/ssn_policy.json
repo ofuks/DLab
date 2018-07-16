@@ -66,6 +66,7 @@
                 "ec2:TerminateInstances",
                 "ec2:DescribeSubnets",
                 "ec2:DescribeVpcs",
+                "ec2:DescribeVpcEndpoints",
                 "ec2:DescribeSecurityGroups",
                 "ec2:DescribeInstances",
                 "ec2:DescribeInstanceStatus",

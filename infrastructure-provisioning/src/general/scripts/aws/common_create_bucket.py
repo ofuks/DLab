@@ -29,6 +29,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--bucket_name', type=str, default='')
 parser.add_argument('--infra_tag_name', type=str, default='')
 parser.add_argument('--infra_tag_value', type=str, default='')
+parser.add_argument('--access_from_vpce', type=str, default=None)
 parser.add_argument('--region', type=str, default='')
 args = parser.parse_args()
 
@@ -42,6 +43,9 @@ if __name__ == "__main__":
             if bucket == '':
                 print("Creating bucket {0} with tag {1}.".format(args.bucket_name, json.dumps(tag)))
                 bucket = create_s3_bucket(args.bucket_name, tag, args.region)
+                if args.access_from_vpce:
+                    print('Setting bucket policy')
+                    set_bucket_policy(args.bucket_name, args.region)
             else:
                 print("REQUESTED BUCKET ALREADY EXISTS")
             print("BUCKET_NAME {}".format(bucket))

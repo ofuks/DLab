@@ -156,10 +156,21 @@ if __name__ == "__main__":
                 "UserIdGroupPairs": [], "PrefixListIds": []
             },
             {
+                "IpProtocol": "-1",
+                "IpRanges": [{"CidrIp": "10.8.246.0/24"}],
+                "UserIdGroupPairs": [], "PrefixListIds": []
+            },
+            {
                 "PrefixListIds": [],
                 "FromPort": 22,
                 "IpRanges": [{"CidrIp": edge_conf['allowed_ip_cidr']}],
                 "ToPort": 22, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            },
+            {
+                "PrefixListIds": [],
+                "FromPort": 3128,
+                "IpRanges": [{"CidrIp": edge_conf['allowed_ip_cidr']}],
+                "ToPort": 3128, "IpProtocol": "tcp", "UserIdGroupPairs": []
             }
         ]
         edge_sg_egress = [
@@ -231,6 +242,13 @@ if __name__ == "__main__":
             },
             {
                 "PrefixListIds": [],
+                "FromPort": 389,
+                "IpRanges": [{"CidrIp": "10.210.32.64/26"}],
+                "ToPort": 389, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            },
+
+            {
+                "PrefixListIds": [],
                 "FromPort": 53,
                 "IpRanges": [{"CidrIp": edge_conf['all_ip_cidr']}],
                 "ToPort": 53, "IpProtocol": "udp", "UserIdGroupPairs": []
@@ -252,7 +270,14 @@ if __name__ == "__main__":
                 "FromPort": 8085,
                 "IpRanges": [{"CidrIp": edge_conf['private_subnet_cidr']}],
                 "ToPort": 8085, "IpProtocol": "tcp", "UserIdGroupPairs": []
+            },
+            {
+                "PrefixListIds": [],
+                "FromPort": 8042,
+                "IpRanges": [{"CidrIp": edge_conf['allowed_ip_cidr']}],
+                "ToPort": 8042, "IpProtocol": "tcp", "UserIdGroupPairs": []
             }
+
         ]
         params = "--name {} --vpc_id {} --security_group_rules '{}' --infra_tag_name {} --infra_tag_value {} \
             --egress '{}' --force {} --nb_sg_name {} --resource {}".\
@@ -396,9 +421,9 @@ if __name__ == "__main__":
     try:
         logging.info('[CREATE BUCKETS]')
         print('[CREATE BUCKETS]')
-        params = "--bucket_name {} --infra_tag_name {} --infra_tag_value {} --region {}" \
-                 .format(edge_conf['bucket_name'], edge_conf['tag_name'], edge_conf['bucket_name'],
-                  edge_conf['region'])
+        params = "--bucket_name {} --infra_tag_name {} --infra_tag_value {} --region {} --access_from_vpce {}" \
+            .format(edge_conf['bucket_name'], edge_conf['tag_name'], edge_conf['bucket_name'],
+                    edge_conf['region'], 'Yes')
         try:
             local("~/scripts/{}.py {}".format('common_create_bucket', params))
         except:

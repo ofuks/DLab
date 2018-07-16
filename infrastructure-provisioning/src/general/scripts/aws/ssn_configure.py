@@ -121,6 +121,8 @@ if __name__ == "__main__":
             raise Exception
     except Exception as err:
         append_result("Failed creating ssh user 'dlab'.", str(err))
+        remove_route_53_record(os.environ['ssn_hosted_zone_id'], os.environ['ssn_hosted_zone_name'],
+                               os.environ['ssn_subdomain'])
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
@@ -149,6 +151,8 @@ if __name__ == "__main__":
             raise Exception
     except Exception as err:
         append_result("Failed installing software: pip, packages.", str(err))
+        remove_route_53_record(os.environ['ssn_hosted_zone_id'], os.environ['ssn_hosted_zone_name'],
+                               os.environ['ssn_subdomain'])
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
@@ -179,6 +183,8 @@ if __name__ == "__main__":
             raise Exception
     except Exception as err:
         append_result("Failed configuring ssn.", str(err))
+        remove_route_53_record(os.environ['ssn_hosted_zone_id'], os.environ['ssn_hosted_zone_name'],
+                               os.environ['ssn_subdomain'])
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
@@ -218,6 +224,8 @@ if __name__ == "__main__":
             raise Exception
     except Exception as err:
         append_result("Unable to configure docker.", str(err))
+        remove_route_53_record(os.environ['ssn_hosted_zone_id'], os.environ['ssn_hosted_zone_name'],
+                               os.environ['ssn_subdomain'])
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
@@ -303,6 +311,8 @@ if __name__ == "__main__":
     except Exception as err:
         append_result("Unable to configure UI.", str(err))
         print(err)
+        remove_route_53_record(os.environ['ssn_hosted_zone_id'], os.environ['ssn_hosted_zone_name'],
+                               os.environ['ssn_subdomain'])
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)
@@ -375,6 +385,8 @@ if __name__ == "__main__":
             params += "--key_id {}".format(os.environ['aws_access_key'])
             local("~/scripts/{}.py {}".format('ssn_finalize', params))
     except:
+        remove_route_53_record(os.environ['ssn_hosted_zone_id'], os.environ['ssn_hosted_zone_name'],
+                               os.environ['ssn_subdomain'])
         remove_ec2(tag_name, instance_name)
         remove_all_iam_resources(instance)
         remove_s3(instance)

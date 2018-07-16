@@ -22,6 +22,7 @@ from fabric.api import *
 import argparse
 import json
 import sys
+import os
 from dlab.ssn_lib import *
 from dlab.fab import *
 
@@ -33,6 +34,13 @@ parser.add_argument('--os_user', type=str, default='')
 parser.add_argument('--dlab_path', type=str, default='')
 parser.add_argument('--tag_resource_id', type=str, default='')
 args = parser.parse_args()
+
+
+def set_hostname():
+    try:
+        sudo('hostnamectl set-hostname {0}.{1}'.format(os.environ['ssn_subdomain'], os.environ['ssn_hosted_zone_name']))
+    except:
+        return False
 
 
 def cp_key(keyfile, host_string, os_user):
@@ -127,6 +135,10 @@ if __name__ == "__main__":
     except:
         sys.exit(2)
 
+    if 'ssn_subdomain' in os.environ and 'ssn_hosted_zone_name' in os.environ:
+        print("Setting hostname")
+        set_hostname()
+
     print("Creating service directories.")
     if not creating_service_directories(args.dlab_path, args.os_user):
         sys.exit(1)
@@ -166,6 +178,12 @@ if __name__ == "__main__":
     print("Ensuring safest ssh ciphers")
     try:
         ensure_ciphers()
+    except:
+        sys.exit(1)
+
+    print("Install Zabbix agent")
+    try:
+        install_zabbix_agent()
     except:
         sys.exit(1)
 

@@ -122,7 +122,8 @@ if __name__ == "__main__":
         print('[INSTALLING HTTP PROXY]')
         logging.info('[INSTALLING HTTP PROXY]')
         additional_config = {"exploratory_subnet": edge_conf['private_subnet_cidr'],
-                             "template_file": "/root/templates/squid.conf"}
+                             "template_file": "/root/templates/squid.conf",
+                             "edge_user_name": os.environ['edge_user_name']}
         params = "--hostname {} --keyfile {} --additional_config '{}' --user {}" \
                  .format(instance_hostname, keyfile_name, json.dumps(additional_config), edge_conf['dlab_ssh_user'])
         try:

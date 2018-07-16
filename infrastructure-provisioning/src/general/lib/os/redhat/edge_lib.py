@@ -30,7 +30,8 @@ def configure_http_proxy_server(config):
             with open("/tmp/tmpsquid.conf", 'w') as out:
                 with open(template_file) as tpl:
                     for line in tpl:
-                        out.write(line.replace('PROXY_SUBNET', proxy_subnet))
+                        out.write(line.replace('PROXY_SUBNET', proxy_subnet).replace('EDGE_USER_NAME',
+                                                                                     config['edge_user_name']))
             put('/tmp/tmpsquid.conf', '/tmp/squid.conf')
             sudo('\cp /tmp/squid.conf /etc/squid/squid.conf')
             sudo('systemctl restart squid')

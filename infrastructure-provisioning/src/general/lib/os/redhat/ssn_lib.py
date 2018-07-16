@@ -312,3 +312,38 @@ def start_ss(keyfile, host_string, dlab_conf_dir, web_path,
         return True
     except:
         return False
+
+
+def install_zabbix_agent():
+    try:
+        if not exists('{}tmp/zabbix_agent_ensured'.format(os.environ['ssn_dlab_path'])):
+            hostname = sudo('hostname')
+            sudo('rpm -ivh http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-2.el7.noarch.rpm')
+            sudo('yum install -y zabbix-agent')
+            sudo('sed -i "s|^Server=.*|Server={}|g" /etc/zabbix/zabbix_agentd.conf'.format(
+                os.environ['ssn_zabbix_server']))
+            sudo('sed -i "s|^ServerActive=.*|ServerActive={}|g" /etc/zabbix/zabbix_agentd.conf'.format(
+                os.environ['ssn_zabbix_server']))
+            sudo('sed -i "s|^Hostname=.*|Hostname={}|g" /etc/zabbix/zabbix_agentd.conf'.format(hostname))
+            sudo('sed -i "s|^# HostMetadata=.*|HostMetadata=DLab|g" /etc/zabbix/zabbix_agentd.conf')
+            sudo('sed -i "s|^# EnableRemoteCommands=.*|EnableRemoteCommands=1|g" /etc/zabbix/zabbix_agentd.conf')
+            sudo('''bash -c 'echo "%zabbix ALL=(ALL) NOPASSWD: /usr/bin/supervisorctl, /usr/bin/systemctl" >> /etc/sudoers' ''')
+            put('/root/files/userparameter_supervisorctl.conf', '/tmp/userparameter_supervisorctl.conf')
+            sudo('cp /tmp/userparameter_supervisorctl.conf /etc/zabbix/zabbix_agentd.d/')
+            put('/root/scripts/start_services.py', '/tmp/start_services.py')
+            sudo('mkdir -p /etc/zabbix/externalscripts/')
+            sudo('mv /tmp/start_services.py /etc/zabbix/externalscripts/')
+            sudo('chmod +x /etc/zabbix/externalscripts/start_services.py')
+            sudo('systemctl enable zabbix-agent')
+            sudo('systemctl start zabbix-agent')
+            sudo('yum -y install net-snmp net-snmp-utils')
+            put('/root/files/snmpd.conf', '/tmp/snmpd.conf')
+            sudo('mv /etc/snmp/snmpd.conf /etc/snmp/snmpd.conf.orig')
+            sudo('cp /tmp/snmpd.conf /etc/snmp/')
+            sudo(''' bash -c "echo 'OPTIONS=\\"-LS0-5d -a -x TCP:161\\"' >> /etc/sysconfig/snmpd " ''')
+            sudo('systemctl enable snmpd')
+            sudo('systemctl start snmpd')
+            sudo('touch {}tmp/zabbix_agent_ensured'.format(os.environ['ssn_dlab_path']))
+        return True
+    except:
+        return False
