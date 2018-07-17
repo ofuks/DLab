@@ -340,7 +340,7 @@ def install_zabbix_agent():
             put('/root/files/snmpd.conf', '/tmp/snmpd.conf')
             sudo('mv /etc/snmp/snmpd.conf /etc/snmp/snmpd.conf.orig')
             sudo('cp /tmp/snmpd.conf /etc/snmp/')
-            sudo(''' bash -c "echo 'OPTIONS=\\"-LS0-5d -a -x TCP:161\\"' >> /etc/sysconfig/snmpd " ''')
+            sudo('''echo 'OPTIONS=\"-LS0-5d -a -x TCP:161\"' >> /etc/sysconfig/snmpd  ''')
             sudo('systemctl enable snmpd')
             sudo('systemctl start snmpd')
             sudo('touch {}tmp/zabbix_agent_ensured'.format(os.environ['ssn_dlab_path']))

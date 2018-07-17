@@ -182,9 +182,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     print("Install Zabbix agent")
-    try:
-        install_zabbix_agent()
-    except:
+    if not install_zabbix_agent():
         sys.exit(1)
 
     sys.exit(0)
