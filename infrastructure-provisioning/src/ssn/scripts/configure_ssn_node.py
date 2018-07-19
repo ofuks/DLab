@@ -118,9 +118,9 @@ def generate_ssl(hostname):
             run('mkdir -p /tmp/wildcard/')
             put('files/*.crt', '/tmp/wildcard/')
             put('files/*.key', '/tmp/wildcard/')
-            local("sudo cp /tmp/wildcard/*.crt /etc/ssl/certs/_wildcard.{}.crt".format(
+            sudo("cp /tmp/wildcard/*.crt /etc/ssl/certs/_wildcard.{}.crt".format(
                 os.environ['ssn_hosted_zone_name']))
-            local("sudo cp /tmp/wildcard/*.key /etc/ssl/certs/_wildcard.{}.key".format(
+            sudo("cp /tmp/wildcard/*.key /etc/ssl/certs/_wildcard.{}.key".format(
                 os.environ['ssn_hosted_zone_name']))
         else:
             sudo('openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/certs/dlab-selfsigned.key \
