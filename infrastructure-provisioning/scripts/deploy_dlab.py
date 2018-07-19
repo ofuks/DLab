@@ -54,6 +54,7 @@ parser.add_argument('--ssn_zabbix_server', type=str, default='', help='Zabbix se
 parser.add_argument('--ssn_hosted_zone_name', type=str, default='', help='Name of hosted zone')
 parser.add_argument('--ssn_hosted_zone_id', type=str, default='', help='ID of hosted zone')
 parser.add_argument('--ssn_subdomain', type=str, default='', help='Subdomain name')
+parser.add_argument('--ssn_custom_certificates', type=str, default='', help='Custom certificates. Available options: True | False')
 parser.add_argument('--workspace_path', type=str, default='', help='Admin key name (WITHOUT ".pem")')
 parser.add_argument('--conf_tag_resource_id', type=str, default='dlab', help='The name of user tag')
 parser.add_argument('--aws_ssn_instance_size', type=str, default='t2.large', help='The SSN instance shape')

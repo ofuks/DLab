@@ -114,8 +114,18 @@ def creating_service_directories(dlab_path, os_user):
 
 def generate_ssl(hostname):
     try:
-        sudo('openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/certs/dlab-selfsigned.key \
-             -out /etc/ssl/certs/dlab-selfsigned.crt -subj "/C=US/ST=US/L=US/O=dlab/CN={}"'.format(hostname))
+        if os.environ['ssn_custom_certificates'] == 'True':
+            run('mkdir -p /tmp/wildcard/')
+            put('files/*.crt', '/tmp/wildcard/')
+            put('files/*.key', '/tmp/wildcard/')
+            local("sudo cp /tmp/wildcard/*.crt /etc/ssl/certs/_wildcard.{}.crt".format(
+                os.environ['ssn_hosted_zone_name']))
+            local("sudo cp /tmp/wildcard/*.key /etc/ssl/certs/_wildcard.{}.key".format(
+                os.environ['ssn_hosted_zone_name']))
+        else:
+            sudo('openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/certs/dlab-selfsigned.key \
+                 -out /etc/ssl/certs/dlab-selfsigned.crt -subj "/C=US/ST=US/L=US/O=dlab/CN={}"'.format(hostname))
+
         sudo('openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048')
         return True
     except:
