@@ -97,7 +97,18 @@ def configure_nginx(config, dlab_path, hostname):
         if not exists("/etc/nginx/conf.d/nginx_proxy.conf"):
             sudo('rm -f /etc/nginx/conf.d/*')
             put(config['nginx_template_dir'] + 'nginx_proxy.conf', '/tmp/nginx_proxy.conf')
-            sudo("sed -i 's|SSN_HOSTNAME|" + hostname + "|' /tmp/nginx_proxy.conf")
+            if 'ssn_subdomain' in os.environ:
+                sudo("sed -i 's|SSN_HOSTNAME|{0}.{1}|g' /tmp/nginx_proxy.conf".format(os.environ['ssn_subdomain'],
+                                                                                      os.environ['ssn_hosted_zone_name']
+                                                                                      ))
+            else:
+                sudo("sed -i 's|SSN_HOSTNAME|" + hostname + "|g' /tmp/nginx_proxy.conf")
+            if os.environ['ssn_custom_certificates'] == 'True':
+                sudo("sed -i 's|CERTIFICATE_NAME|_wildcard.{}|g' /tmp/nginx_proxy.conf".format(
+                    os.environ['ssn_hosted_zone_name']))
+                sudo("sed -i 's|# rewrite|rewrite|g' /tmp/nginx_proxy.conf")
+            else:
+                sudo("sed -i 's|CERTIFICATE_NAME|dlab-selfsigned|g' /tmp/nginx_proxy.conf")
             sudo('mv /tmp/nginx_proxy.conf ' + dlab_path + 'tmp/')
             sudo('\cp ' + dlab_path + 'tmp/nginx_proxy.conf /etc/nginx/conf.d/')
             sudo('mkdir -p /etc/nginx/locations')
