@@ -47,9 +47,9 @@ server:
   requestLog:
     appenders:
       - type: file
-        currentLogFilename: ${LOG_ROOT_DIR}/ssn/request-provisioning.log
+        currentLogFilename: ${LOG_ROOT_DIR}/ssn/${sys['user.name']}/request-provisioning.log
         archive: true
-        archivedLogFilenamePattern: ${LOG_ROOT_DIR}/ssn/request-provisioning-%d{yyyy-MM-dd}.log.gz
+        archivedLogFilenamePattern: ${LOG_ROOT_DIR}/ssn/${sys['user.name']}/request-provisioning-%d{yyyy-MM-dd}.log.gz
         archivedFileCount: 10
   applicationConnectors:
 #    - type: http
@@ -80,7 +80,7 @@ logging:
     - type: console
 </#if>
     - type: file
-      currentLogFilename: ${LOG_ROOT_DIR}/ssn/provisioning.log
+      currentLogFilename: ${LOG_ROOT_DIR}/ssn/${sys['user.name']}/provisioning.log
       archive: true
-      archivedLogFilenamePattern: ${LOG_ROOT_DIR}/ssn/provisioning-%d{yyyy-MM-dd}.log.gz
+      archivedLogFilenamePattern: ${LOG_ROOT_DIR}/ssn/${sys['user.name']}/provisioning-%d{yyyy-MM-dd}.log.gz
       archivedFileCount: 10

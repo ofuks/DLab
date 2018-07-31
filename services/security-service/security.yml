@@ -123,9 +123,9 @@ server:
   requestLog:
     appenders:
       - type: file
-        currentLogFilename: ${LOG_ROOT_DIR}/ssn/request-security.log
+        currentLogFilename: ${LOG_ROOT_DIR}/ssn/${sys['user.name']}/request-security.log
         archive: true
-        archivedLogFilenamePattern: ${LOG_ROOT_DIR}/ssn/request-security-%d{yyyy-MM-dd}.log.gz
+        archivedLogFilenamePattern: ${LOG_ROOT_DIR}/ssn/${sys['user.name']}/request-security-%d{yyyy-MM-dd}.log.gz
         archivedFileCount: 10
   applicationConnectors:
     - type: https
@@ -205,7 +205,7 @@ logging:
     - type: console
 #</#if>
     - type: file
-      currentLogFilename: ${LOG_ROOT_DIR}/ssn/security.log
+      currentLogFilename: ${LOG_ROOT_DIR}/ssn/${sys['user.name']}/security.log
       archive: true
-      archivedLogFilenamePattern: ${LOG_ROOT_DIR}/ssn/security-%d{yyyy-MM-dd}.log.gz
+      archivedLogFilenamePattern: ${LOG_ROOT_DIR}/ssn/${sys['user.name']}/security-%d{yyyy-MM-dd}.log.gz
       archivedFileCount: 10
