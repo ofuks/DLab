@@ -35,6 +35,7 @@ import com.epam.dlab.dto.computational.ComputationalStartDTO;
 import com.epam.dlab.dto.computational.ComputationalStopDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.contracts.ComputationalAPI;
+import com.epam.dlab.util.LoggerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Inject;
 import io.dropwizard.auth.Auth;
@@ -64,6 +65,7 @@ public class ComputationalResourceAws extends DockerService implements DockerCom
 	@POST
 	@Path(ComputationalAPI.COMPUTATIONAL_CREATE_CLOUD_SPECIFIC)
 	public String create(@Auth UserInfo ui, ComputationalCreateAws dto) {
+		LoggerService.defineUser(ui);
 		log.debug("Create computational resources {} for user {}: {}", dto.getComputationalName(), ui.getName(), dto);
 		String uuid = DockerCommands.generateUUID();
 		folderListenerExecutor.start(configuration.getImagesDirectory(),
@@ -101,7 +103,7 @@ public class ComputationalResourceAws extends DockerService implements DockerCom
 	@POST
 	@Path(ComputationalAPI.COMPUTATIONAL_TERMINATE_CLOUD_SPECIFIC)
 	public String terminate(@Auth UserInfo ui, AwsComputationalTerminateDTO dto) {
-
+		LoggerService.defineUser(ui);
 		log.debug("Terminate computational resources {} for user {}: {}", dto.getComputationalName(), ui.getName(),
 				dto);
 		String uuid = DockerCommands.generateUUID();
@@ -130,16 +132,12 @@ public class ComputationalResourceAws extends DockerService implements DockerCom
 		} catch (JsonProcessingException t) {
 			throw new DlabException("Could not terminate computational resources cluster", t);
 		}
-
 		return uuid;
 	}
 
 	@POST
 	@Path(ComputationalAPI.COMPUTATIONAL_CREATE_SPARK)
 	public String createSparkCluster(@Auth UserInfo ui, SparkComputationalCreateAws dto) {
-		log.debug("Create computational Spark resources {} for user {}: {}", dto.getComputationalName(), ui.getName(),
-				dto);
-
 		return sparkClusterService.create(ui, dto);
 	}
 
@@ -147,27 +145,18 @@ public class ComputationalResourceAws extends DockerService implements DockerCom
 	@POST
 	@Path(ComputationalAPI.COMPUTATIONAL_TERMINATE_SPARK)
 	public String terminateSparkCluster(@Auth UserInfo ui, AwsComputationalTerminateDTO dto) {
-		log.debug("Terminate computational Spark resource {} for user {}: {}", dto.getComputationalName(), ui.getName
-				(), dto);
-
 		return sparkClusterService.terminate(ui, dto);
 	}
 
 	@POST
 	@Path(ComputationalAPI.COMPUTATIONAL_STOP_SPARK)
 	public String stopSparkCluster(@Auth UserInfo ui, ComputationalStopDTO dto) {
-		log.debug("Stop computational Spark resources {} for user {}: {}",
-				dto.getComputationalName(), ui.getName(), dto);
-
 		return sparkClusterService.stop(ui, dto);
 	}
 
 	@POST
 	@Path(ComputationalAPI.COMPUTATIONAL_START_SPARK)
 	public String startSparkCluster(@Auth UserInfo ui, ComputationalStartDTO dto) {
-		log.debug("Start computational Spark resource {} for user {}: {}",
-				dto.getComputationalName(), ui.getName(), dto);
-
 		return sparkClusterService.start(ui, dto);
 	}
 

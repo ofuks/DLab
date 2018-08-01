@@ -25,6 +25,7 @@ import com.epam.dlab.dto.exploratory.LibStatus;
 import com.epam.dlab.dto.status.EnvResource;
 import com.epam.dlab.dto.status.EnvResourceList;
 import com.epam.dlab.exceptions.DlabException;
+import com.epam.dlab.util.LoggerService;
 import com.epam.dlab.util.SecurityUtils;
 import com.epam.dlab.util.ServiceUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -106,6 +107,7 @@ public class CommandExecutorMockAsync implements Supplier<Boolean> {
 	}
 
 	public void run() {
+		LoggerService.defineUser(user);
 		log.debug("Run OS command for user {} with UUID {}: {}", user, uuid, SecurityUtils.hideCreds(command));
 
 		responseFileName = null;

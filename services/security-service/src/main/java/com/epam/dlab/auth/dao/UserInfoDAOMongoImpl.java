@@ -22,6 +22,7 @@ import com.epam.dlab.auth.SecurityServiceConfiguration;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.UserInfoDAO;
 import com.epam.dlab.mongo.MongoService;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mongodb.BasicDBList;
@@ -55,15 +56,15 @@ public class UserInfoDAOMongoImpl implements UserInfoDAO {
 			log.warn("UI not found {}", accessToken);
 			return null;
 		}
+		String name = uiDoc.get("name").toString();
+		LoggerService.defineUser(name);
 		Date lastAccess = uiDoc.getDate("expireAt");
 		if (inactiveUserTimeoutMsec < Math.abs(new Date().getTime() - lastAccess.getTime())) {
 			log.warn("UI for {} expired but were not evicted from DB. Contact MongoDB admin to create expireable " +
-					"index" +
-					" on 'expireAt' key.", accessToken);
+					"index on 'expireAt' key.", accessToken);
 			this.deleteUserInfo(accessToken);
 			return null;
 		}
-		String name = uiDoc.get("name").toString();
 		String firstName = uiDoc.getString("firstName", "");
 		String lastName = uiDoc.getString("lastName", "");
 		String remoteIp = uiDoc.getString("remoteIp", "");
@@ -87,6 +88,7 @@ public class UserInfoDAOMongoImpl implements UserInfoDAO {
 	public void updateUserInfoTTL(String accessToken, UserInfo ui) {
 		//Update is caleed often, but does not need to be synchronized with the main thread
 
+		LoggerService.defineUser(ui);
 		BasicDBObject uiDoc = new BasicDBObject();
 		uiDoc.put("_id", accessToken);
 		uiDoc.put("expireAt", new Date(System.currentTimeMillis()));
@@ -111,6 +113,7 @@ public class UserInfoDAOMongoImpl implements UserInfoDAO {
 		//UserInfo first cached and immediately becomes available
 		//Saving can be asynch
 
+		LoggerService.defineUser(ui);
 		BasicDBObject uiDoc = new BasicDBObject();
 		uiDoc.put("_id", ui.getAccessToken());
 		uiDoc.put("name", ui.getName());

@@ -18,12 +18,13 @@
 
 package com.epam.dlab.backendapi.core.response.handlers;
 
-import com.epam.dlab.dto.UserInstanceStatus;
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.commands.DockerAction;
 import com.epam.dlab.dto.StatusBaseDTO;
+import com.epam.dlab.dto.UserInstanceStatus;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.util.LoggerService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
@@ -85,9 +86,10 @@ public abstract class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
         return this.uuid.equals(uuid);
     }
 
-    public String getUser() {
-        return user;
-    }
+	@Override
+	public String getUser() {
+		return user;
+	}
 
     public DockerAction getAction() {
         return action;
@@ -106,6 +108,7 @@ public abstract class ResourceCallbackHandler<T extends StatusBaseDTO<?>> implem
 
     @Override
     public boolean handle(String fileName, byte[] content) throws Exception {
+		LoggerService.defineUser(user);
         debugMessage("Got file {} while waiting for UUID {}, for action {}, docker response: {}",
                 fileName, uuid, action.name(), new String(content));
         JsonNode document = mapper.readTree(content);

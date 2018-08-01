@@ -50,6 +50,11 @@ public class ReuploadKeyCallbackHandler implements FileHandlerCallback {
 	}
 
 	@Override
+	public String getUser() {
+		return user;
+	}
+
+	@Override
 	public boolean checkUUID(String uuid) {
 		return this.uuid.equals(uuid);
 	}

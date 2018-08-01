@@ -27,6 +27,7 @@ import com.epam.dlab.dto.status.EnvResource;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.process.model.ProcessInfo;
 import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -54,6 +55,7 @@ public abstract class InfrastructureService implements DockerCommands {
 	private static final String CONTAINER_NAME_REGEX_FORMAT = "%s_[^_\\W]+_%s(|_%s)_\\d+";
 
 	public String action(String username, UserEnvironmentResources dto, String iamUser, DockerAction dockerAction) {
+		LoggerService.defineUser(username);
 		log.trace("Request the status of resources for user {}: {}", username, dto);
 		String uuid = DockerCommands.generateUUID();
 		folderListenerExecutor.start(configuration.getImagesDirectory(),

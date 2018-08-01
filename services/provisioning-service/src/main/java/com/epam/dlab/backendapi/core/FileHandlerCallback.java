@@ -25,6 +25,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public interface FileHandlerCallback {
 	String getUUID();
 
+	String getUser();
+
 	boolean checkUUID(String uuid);
 
 	boolean handle(String fileName, byte[] content) throws Exception;

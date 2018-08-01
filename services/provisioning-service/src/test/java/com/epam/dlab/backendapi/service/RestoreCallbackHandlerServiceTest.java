@@ -54,10 +54,10 @@ public class RestoreCallbackHandlerServiceTest {
 		restoreCallbackHandlerService.start();
 
 		verify(dao).findAll();
-		verify(folderListenerExecutor).start(handler1.getDirectory(), Duration.milliseconds(handler1.getTimeout()),
-				handler1.getHandler());
-		verify(folderListenerExecutor).start(handler2.getDirectory(), Duration.milliseconds(handler2.getTimeout()),
-				handler2.getHandler());
+		verify(folderListenerExecutor).start(handler1.getDirectory(),
+				Duration.milliseconds(handler1.getTimeout()), handler1.getHandler());
+		verify(folderListenerExecutor).start(handler2.getDirectory(),
+				Duration.milliseconds(handler2.getTimeout()), handler2.getHandler());
 		verifyNoMoreInteractions(dao, folderListenerExecutor);
 	}
 }

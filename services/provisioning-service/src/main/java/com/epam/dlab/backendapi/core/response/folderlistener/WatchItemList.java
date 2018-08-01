@@ -24,7 +24,9 @@ import com.epam.dlab.backendapi.core.commands.DockerCommands;
 import com.epam.dlab.backendapi.core.response.folderlistener.WatchItem.ItemStatus;
 import com.epam.dlab.backendapi.core.response.handlers.PersistentFileHandler;
 import com.epam.dlab.backendapi.core.response.handlers.dao.CallbackHandlerDao;
+import com.epam.dlab.util.LoggerService;
 import io.dropwizard.util.Duration;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +70,11 @@ public class WatchItemList {
 		@Override
 		public String getUUID() {
 			return uuidSearch;
+		}
+
+		@Override
+		public String getUser() {
+			return StringUtils.EMPTY;
 		}
 
 		@Override
@@ -124,6 +131,7 @@ public class WatchItemList {
 		if (Objects.nonNull(handlerDao)) {
 			handlerDao.upsert(new PersistentFileHandler(fileHandlerCallback, timeoutMillis, directoryName));
 		}
+		LoggerService.defineUser(fileHandlerCallback.getUser());
 		WatchItem item = new WatchItem(fileHandlerCallback, timeoutMillis, fileLengthCheckDelay);
 		synchronized (this) {
 			int index = Collections.binarySearch(list, item);

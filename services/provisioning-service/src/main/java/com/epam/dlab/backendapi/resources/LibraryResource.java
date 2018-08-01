@@ -19,11 +19,12 @@ package com.epam.dlab.backendapi.resources;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.core.Directories;
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
-import com.epam.dlab.backendapi.core.commands.*;
+import com.epam.dlab.backendapi.core.commands.DockerAction;
+import com.epam.dlab.backendapi.core.commands.DockerCommands;
+import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.backendapi.core.response.handlers.LibInstallCallbackHandler;
 import com.epam.dlab.backendapi.core.response.handlers.LibListCallbackHandler;
 import com.epam.dlab.backendapi.service.DockerService;
-import com.epam.dlab.backendapi.core.commands.DockerAction;
 import com.epam.dlab.dto.LibListComputationalDTO;
 import com.epam.dlab.dto.base.DataEngineType;
 import com.epam.dlab.dto.exploratory.ExploratoryActionDTO;
@@ -31,6 +32,7 @@ import com.epam.dlab.dto.exploratory.ExploratoryBaseDTO;
 import com.epam.dlab.dto.exploratory.LibraryInstallDTO;
 import com.epam.dlab.rest.contracts.ComputationalAPI;
 import com.epam.dlab.rest.contracts.ExploratoryAPI;
+import com.epam.dlab.util.LoggerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.dropwizard.auth.Auth;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +74,7 @@ public class LibraryResource extends DockerService implements DockerCommands {
     }
 
     private String actionExploratory(String username, ExploratoryBaseDTO<?> dto, DockerAction action) throws JsonProcessingException {
+		LoggerService.defineUser(username);
         log.debug("{} user {} exploratory environment {}", action, username, dto);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),
@@ -85,6 +88,7 @@ public class LibraryResource extends DockerService implements DockerCommands {
     }
 
     private String actionComputational(String username, ExploratoryActionDTO<?> dto, DockerAction action) throws JsonProcessingException {
+		LoggerService.defineUser(username);
         log.debug("{} user {} exploratory environment {}", action, username, dto);
         String uuid = DockerCommands.generateUUID();
         folderListenerExecutor.start(configuration.getImagesDirectory(),

@@ -23,6 +23,7 @@ import com.epam.dlab.backendapi.core.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.WatchItem.ItemStatus;
 import com.epam.dlab.backendapi.core.response.handlers.dao.CallbackHandlerDao;
 import com.epam.dlab.exceptions.DlabException;
+import com.epam.dlab.util.LoggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,8 +91,10 @@ public class FolderListener implements Runnable {
 	 * @param callbackHandlerDao   callbackHandlerDao for handlers
 	 * @return Instance of the file handler.
 	 */
-	public static WatchItem listen(String directoryName, FileHandlerCallback fileHandlerCallback, long timeoutMillis,
+	public static WatchItem listen(String directoryName, FileHandlerCallback fileHandlerCallback,
+								   long timeoutMillis,
 								   long fileLengthCheckDelay, String fileName, CallbackHandlerDao callbackHandlerDao) {
+		LoggerService.defineUser(fileHandlerCallback.getUser());
 		FolderListener listener;
 		WatchItem item;
 
@@ -389,7 +392,8 @@ public class FolderListener implements Runnable {
 				String[] fileList = getNewFiles();
 				if (fileList != null) {
 					for (String fileName : fileList) {
-						LOGGER.trace("Folder listener \"{}\" handes the file {}", getDirectoryName(), fileName);
+						LoggerService.defineUser(getItemList().getItem(fileName).getFileHandlerCallback().getUser());
+						LOGGER.trace("Folder listener \"{}\" handles the file {}", getDirectoryName(), fileName);
 						processItem(fileName);
 					}
 				}
@@ -416,6 +420,7 @@ public class FolderListener implements Runnable {
 	private void processItem(String fileName) {
 		try {
 			WatchItem item = itemList.getItem(fileName);
+			LoggerService.defineUser(item.getFileHandlerCallback().getUser());
 			item.setFileName(fileName);
 			if (itemList.processItem(item)) {
 				LOGGER.debug("Folder listener \"{}\" processes the file {}", getDirectoryName(),

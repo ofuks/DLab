@@ -25,6 +25,7 @@ import com.epam.dlab.backendapi.core.response.handlers.ImageCreateCallbackHandle
 import com.epam.dlab.backendapi.service.DockerService;
 import com.epam.dlab.dto.exploratory.ExploratoryImageDTO;
 import com.epam.dlab.rest.contracts.ExploratoryAPI;
+import com.epam.dlab.util.LoggerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.dropwizard.auth.Auth;
 import lombok.extern.slf4j.Slf4j;
@@ -44,11 +45,11 @@ public class ImageResource extends DockerService implements DockerCommands {
 
 	@POST
 	public Response createImage(@Auth UserInfo ui, ExploratoryImageDTO image) throws JsonProcessingException {
+		LoggerService.defineUser(ui);
 		final String uuid = DockerCommands.generateUUID();
 
 		folderListenerExecutor.start(configuration.getImagesDirectory(), configuration.getResourceStatusPollTimeout(),
-				new ImageCreateCallbackHandler(selfService, uuid,
-						DockerAction.CREATE_IMAGE, image));
+				new ImageCreateCallbackHandler(selfService, uuid, DockerAction.CREATE_IMAGE, image));
 		String command = commandBuilder.buildCommand(getDockerCommand(DockerAction.CREATE_IMAGE, uuid, image), image);
 		commandExecutor.executeAsync(ui.getName(), uuid, command);
 		log.debug("Docker command: " + command);

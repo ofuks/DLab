@@ -26,6 +26,7 @@ import com.epam.dlab.dto.backup.EnvBackupDTO;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.ApiCallbacks;
 import com.epam.dlab.rest.contracts.BackupAPI;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 import io.dropwizard.auth.Auth;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +56,9 @@ public class BackupResource {
 
 	@POST
 	public Response createBackup(@Auth UserInfo ui, EnvBackupDTO dto) {
-		folderListenerExecutor.start(configuration.getBackupDirectory(), configuration.getProcessTimeout(),
+		LoggerService.defineUser(ui);
+		folderListenerExecutor.start(configuration.getBackupDirectory(),
+				configuration.getProcessTimeout(),
 				new BackupCallbackHandler(selfService, ApiCallbacks.BACKUP_URI, ui.getName(), dto));
 		String command = new PythonBackupCommand(configuration.getBackupScriptPath())
 				.withConfig(dto.getConfigFiles())

@@ -18,9 +18,10 @@
 
 package com.epam.dlab.auth;
 
+import com.epam.dlab.auth.contract.SecurityAPI;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.rest.client.RESTService;
-import com.epam.dlab.auth.contract.SecurityAPI;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import io.dropwizard.auth.AuthenticationException;
@@ -42,9 +43,10 @@ public class SecurityRestAuthenticator implements Authenticator<String, UserInfo
 
 	@Override
 	public Optional<UserInfo> authenticate(String credentials) throws AuthenticationException {
-		LOGGER.debug("authenticate token {}", credentials);
-
-		return Optional.ofNullable(systemUserInfoService.getUser(credentials).orElseGet(
+		Optional<UserInfo> userInfo = Optional.ofNullable(systemUserInfoService.getUser(credentials).orElseGet(
 				() -> securityService.post(SecurityAPI.GET_USER_INFO, credentials, UserInfo.class)));
+		userInfo.ifPresent(LoggerService::defineUser);
+		LOGGER.debug("authenticate token {}", credentials);
+		return userInfo;
 	}
 }

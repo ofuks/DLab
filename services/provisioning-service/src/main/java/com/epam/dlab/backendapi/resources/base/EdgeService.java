@@ -24,6 +24,7 @@ import com.epam.dlab.backendapi.core.response.folderlistener.FolderListenerExecu
 import com.epam.dlab.dto.ResourceSysBaseDTO;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.KeyAPI;
+import com.epam.dlab.util.LoggerService;
 import com.epam.dlab.util.UsernameUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Inject;
@@ -52,6 +53,7 @@ public abstract class EdgeService implements DockerCommands {
 
 	protected String action(String username, ResourceSysBaseDTO<?> dto, String iamUser, String callbackURI,
 							DockerAction action) throws JsonProcessingException {
+		LoggerService.defineUser(username);
 		logger.debug("{} EDGE node for user {}: {}", action, username, dto);
 		String uuid = DockerCommands.generateUUID();
 

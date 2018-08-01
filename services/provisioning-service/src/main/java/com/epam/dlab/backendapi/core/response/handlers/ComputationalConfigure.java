@@ -27,6 +27,7 @@ import com.epam.dlab.dto.base.computational.ComputationalBase;
 import com.epam.dlab.dto.gcp.computational.SparkComputationalCreateGcp;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.rest.client.RESTService;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -71,8 +72,9 @@ public class ComputationalConfigure implements DockerCommands {
 	}
 
 	private String runConfigure(String uuid, ComputationalBase<?> dto, DataEngineType dataEngineType) {
-		log.debug("Configure computational resources {} for user {}: {}", dto.getComputationalName(), dto
-				.getEdgeUserName(), dto);
+		String user = dto.getEdgeUserName();
+		LoggerService.defineUser(user);
+		log.debug("Configure computational resources {} for user {}: {}", dto.getComputationalName(), user, dto);
 		folderListenerExecutor.start(
 				configuration.getImagesDirectory(),
 				configuration.getResourceStatusPollTimeout(),

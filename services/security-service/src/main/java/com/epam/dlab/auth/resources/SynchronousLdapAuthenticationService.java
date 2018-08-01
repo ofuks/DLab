@@ -25,6 +25,7 @@ import com.epam.dlab.auth.dto.UserCredentialDTO;
 import com.epam.dlab.auth.rest.AbstractAuthenticationService;
 import com.epam.dlab.constants.ServiceConsts;
 import com.epam.dlab.exceptions.DlabException;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -69,6 +70,8 @@ public class SynchronousLdapAuthenticationService extends AbstractAuthentication
 		String remoteIp = request.getRemoteAddr();
 		String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
 
+		LoggerService.defineUser(username);
+
 		log.debug("validating username:{} password:****** token:{} ip:{}", username, accessToken, remoteIp);
 
 		if (accessToken != null && !accessToken.isEmpty()) {
@@ -76,7 +79,7 @@ public class SynchronousLdapAuthenticationService extends AbstractAuthentication
 			if (ui != null) {
 				return Response.ok(accessToken).build();
 			} else {
-				log.debug("User info not found on login by access_token for user", username);
+				log.debug("User info not found on login by access_token for user {}", username);
 				return Response.status(Response.Status.UNAUTHORIZED).build();
 			}
 		}

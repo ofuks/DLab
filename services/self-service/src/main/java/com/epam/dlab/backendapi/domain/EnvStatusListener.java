@@ -28,6 +28,7 @@ import com.epam.dlab.dto.UserEnvironmentResources;
 import com.epam.dlab.dto.status.EnvResourceList;
 import com.epam.dlab.rest.client.RESTService;
 import com.epam.dlab.rest.contracts.InfrasctructureAPI;
+import com.epam.dlab.util.LoggerService;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalNotification;
@@ -140,7 +141,7 @@ public class EnvStatusListener implements Managed {
 		 * @return UUID associated with async operation
 		 */
 		private String checkStatusThroughProvisioningService(UserInfo userInfo) {
-
+			LoggerService.defineUser(userInfo);
 			String uuid = null;
 			EnvResourceList resourceList = dao.findEnvResources(userInfo.getName());
 			UserEnvironmentResources dto = requestBuilder.newUserEnvironmentStatus(userInfo);

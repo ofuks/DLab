@@ -18,6 +18,7 @@ package com.epam.dlab.backendapi.resources;
 
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.rest.contracts.InfrasctructureAPI;
+import com.epam.dlab.util.LoggerService;
 import io.dropwizard.auth.Auth;
 
 import javax.ws.rs.Consumes;
@@ -37,6 +38,7 @@ public class InfrastructureResource {
 	 */
 	@GET
 	public Response status(@Auth UserInfo ui) {
+		LoggerService.defineUser(ui);
 		return Response.status(Response.Status.OK).build();
 	}
 

@@ -20,6 +20,7 @@ package com.epam.dlab.auth.dao;
 
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.auth.UserInfoDAO;
+import com.epam.dlab.util.LoggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ public class UserInfoDAODumbImpl implements UserInfoDAO {
 
 	@Override
 	public void updateUserInfoTTL(String accessToken, UserInfo ui) {
+		LoggerService.defineUser(ui);
 		LOG.debug("UserInfo persistence update unavailable: {} {}",accessToken,ui);
 	}
 
@@ -45,6 +47,7 @@ public class UserInfoDAODumbImpl implements UserInfoDAO {
 
 	@Override
 	public void saveUserInfo(UserInfo ui) {
+		LoggerService.defineUser(ui);
 		LOG.debug("UserInfo persistence save unavailable: {}",ui);
 	}
 

@@ -27,6 +27,7 @@ import com.epam.dlab.dto.aws.keyload.UploadFileAws;
 import com.epam.dlab.dto.base.keyload.UploadFileResult;
 import com.epam.dlab.rest.contracts.EdgeAPI;
 import com.epam.dlab.util.FileUtils;
+import com.epam.dlab.util.LoggerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.dropwizard.auth.Auth;
 import lombok.extern.slf4j.Slf4j;
@@ -38,9 +39,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
-import static com.epam.dlab.rest.contracts.ApiCallbacks.EDGE;
-import static com.epam.dlab.rest.contracts.ApiCallbacks.KEY_LOADER;
-import static com.epam.dlab.rest.contracts.ApiCallbacks.STATUS_URI;
+import static com.epam.dlab.rest.contracts.ApiCallbacks.*;
 
 /**
  * Provides API to manage Edge node on AWS
@@ -58,6 +57,7 @@ public class EdgeResourceAws extends EdgeService {
 	@POST
 	@Path("/create")
 	public String create(@Auth UserInfo ui, UploadFileAws dto) throws IOException {
+		LoggerService.defineUser(ui);
 		FileUtils.saveToFile(getKeyFilename(dto.getEdge().getEdgeUserName()), getKeyDirectory(), dto.getContent());
 		return action(ui.getName(), dto.getEdge(), dto.getEdge().getCloudSettings().getIamUser(), KEY_LOADER,
 				DockerAction.CREATE);

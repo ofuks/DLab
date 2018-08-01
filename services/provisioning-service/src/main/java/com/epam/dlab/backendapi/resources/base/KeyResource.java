@@ -24,6 +24,7 @@ import com.epam.dlab.backendapi.service.ReuploadKeyService;
 import com.epam.dlab.dto.reuploadkey.ReuploadKeyDTO;
 import com.epam.dlab.rest.contracts.KeyAPI;
 import com.epam.dlab.util.FileUtils;
+import com.epam.dlab.util.LoggerService;
 import com.epam.dlab.util.UsernameUtils;
 import com.google.inject.Inject;
 import io.dropwizard.auth.Auth;
@@ -49,6 +50,7 @@ public class KeyResource {
 	@POST
 	public String reuploadKey(@Auth UserInfo ui, @DefaultValue("true") @QueryParam("is_primary_reuploading")
 			boolean isPrimaryReuploading, ReuploadKeyDTO dto) throws IOException {
+		LoggerService.defineUser(ui);
 		if (isPrimaryReuploading) {
 			replaceKeyfile(dto);
 		}

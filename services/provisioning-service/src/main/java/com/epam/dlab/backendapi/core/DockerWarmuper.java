@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
 public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DockerWarmuper.class);
 	public static final String EXPLORATORY_RESPONSE_MARKER = "exploratory_environment_shapes";
+	private static final String SYSTEM_USER = "server";
 
 	@Inject
 	private ProvisioningServiceApplicationConfiguration configuration;
@@ -61,7 +62,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
 	@Override
 	public void start() throws Exception {
 		LOGGER.debug("warming up docker");
-		final ProcessInfo processInfo = commandExecutor.executeSync("warmup", DockerCommands.generateUUID(),
+		final ProcessInfo processInfo = commandExecutor.executeSync(SYSTEM_USER, DockerCommands.generateUUID(),
                 GET_IMAGES);
 		List<String> images = Arrays.asList(processInfo.getStdOut().split("\n"));
 		for (String image : images) {
@@ -79,7 +80,7 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
 					.withRequestId(uuid)
 					.withActionDescribe(image)
 					.toCMD();
-			commandExecutor.executeAsync("warmup", uuid, command);
+			commandExecutor.executeAsync(SYSTEM_USER, uuid, command);
 		}
 	}
 
@@ -94,6 +95,11 @@ public class DockerWarmuper implements Managed, DockerCommands, MetadataHolder {
 		@Override
 		public String getUUID() {
 			return uuid;
+		}
+
+		@Override
+		public String getUser() {
+			return SYSTEM_USER;
 		}
 
 		@Override

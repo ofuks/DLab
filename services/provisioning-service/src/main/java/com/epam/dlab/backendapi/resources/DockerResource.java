@@ -28,6 +28,7 @@ import com.epam.dlab.backendapi.core.commands.ICommandExecutor;
 import com.epam.dlab.backendapi.core.commands.RunDockerCommand;
 import com.epam.dlab.dto.imagemetadata.ImageMetadataDTO;
 import com.epam.dlab.dto.imagemetadata.ImageType;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
@@ -55,6 +56,7 @@ public class DockerResource implements DockerCommands {
     @GET
     @Path("{type}")
     public Set<ImageMetadataDTO> getDockerImages(@Auth UserInfo ui, @PathParam("type") String type) {
+		LoggerService.defineUser(ui);
         LOGGER.debug("docker statuses asked for {}", type);
         return metadataHolder
                 .getMetadata(ImageType.valueOf(type.toUpperCase()));
@@ -63,6 +65,7 @@ public class DockerResource implements DockerCommands {
     @Path("/run")
     @POST
     public String run(@Auth UserInfo ui, String image) {
+		LoggerService.defineUser(ui);
         LOGGER.debug("run docker image {}", image);
         String uuid = DockerCommands.generateUUID();
         commandExecutor.executeAsync(

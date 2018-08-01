@@ -30,12 +30,15 @@ import com.epam.dlab.dto.computational.ComputationalStartDTO;
 import com.epam.dlab.dto.computational.ComputationalStopDTO;
 import com.epam.dlab.dto.computational.ComputationalTerminateDTO;
 import com.epam.dlab.exceptions.DlabException;
+import com.epam.dlab.util.LoggerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 
 import static com.epam.dlab.backendapi.core.commands.DockerAction.*;
 
+@Slf4j
 @Singleton
 public class SparkClusterService extends DockerService implements DockerCommands {
 
@@ -61,6 +64,9 @@ public class SparkClusterService extends DockerService implements DockerCommands
 	}
 
 	private String action(UserInfo ui, ComputationalBase<?> dto, DockerAction action) {
+		LoggerService.defineUser(ui);
+		log.debug("{} computational Spark resource {} for user {}: {}", action,
+				dto.getComputationalName(), ui.getName(), dto);
 		String uuid = DockerCommands.generateUUID();
 		folderListenerExecutor.start(configuration.getImagesDirectory(),
 				configuration.getResourceStatusPollTimeout(),

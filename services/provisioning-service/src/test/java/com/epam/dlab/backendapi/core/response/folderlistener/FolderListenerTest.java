@@ -20,6 +20,7 @@ package com.epam.dlab.backendapi.core.response.folderlistener;
 
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
 import com.epam.dlab.util.ServiceUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -48,6 +49,11 @@ public class FolderListenerTest {
 		@Override
 		public String getUUID() {
 			return uuid;
+		}
+
+		@Override
+		public String getUser() {
+			return StringUtils.EMPTY;
 		}
 
 		@Override

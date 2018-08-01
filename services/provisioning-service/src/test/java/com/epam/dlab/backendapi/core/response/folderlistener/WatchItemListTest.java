@@ -20,6 +20,7 @@ package com.epam.dlab.backendapi.core.response.folderlistener;
 
 import com.epam.dlab.backendapi.core.FileHandlerCallback;
 import com.epam.dlab.backendapi.core.response.folderlistener.WatchItem.ItemStatus;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
@@ -47,6 +48,11 @@ public class WatchItemListTest {
 		@Override
 		public String getUUID() {
 			return uuid;
+		}
+
+		@Override
+		public String getUser() {
+			return StringUtils.EMPTY;
 		}
 
 		@Override
