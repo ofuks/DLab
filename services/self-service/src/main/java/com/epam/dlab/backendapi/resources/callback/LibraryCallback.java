@@ -23,6 +23,7 @@ import com.epam.dlab.dto.UserInstanceStatus;
 import com.epam.dlab.dto.exploratory.LibInstallStatusDTO;
 import com.epam.dlab.dto.exploratory.LibListStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,6 +54,7 @@ public class LibraryCallback {
     @POST
     @Path("/lib_status")
     public Response libInstallStatus(LibInstallStatusDTO dto) {
+		LoggerService.defineUser(dto.getUser());
         log.debug("Updating status of libraries for exploratory environment {} for user {} to {}",
                 dto.getExploratoryName(), dto.getUser(), dto);
 		requestId.checkAndRemove(dto.getRequestId());
@@ -78,6 +80,7 @@ public class LibraryCallback {
     @POST
     @Path("/update_lib_list")
     public Response updateLibList(LibListStatusDTO dto) {
+		LoggerService.defineUser(dto.getUser());
         log.debug("Updating the list of libraries for image {}", dto.getImageName());
 		requestId.checkAndRemove(dto.getRequestId());
         try {

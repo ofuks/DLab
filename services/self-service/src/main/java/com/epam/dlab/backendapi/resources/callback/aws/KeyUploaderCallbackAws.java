@@ -20,6 +20,7 @@ import com.epam.dlab.backendapi.domain.RequestId;
 import com.epam.dlab.backendapi.resources.callback.base.KeyUploaderCallback;
 import com.epam.dlab.dto.aws.edge.EdgeInfoAws;
 import com.epam.dlab.dto.base.keyload.UploadFileResult;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,6 +54,7 @@ public class KeyUploaderCallbackAws {
     @POST
     @Path("/callback")
 	public Response loadKeyResponse(UploadFileResult<EdgeInfoAws> dto) {
+		LoggerService.defineUser(dto.getUser());
         log.debug("Upload the key result and EDGE node info for user {}: {}", dto.getUser(), dto);
 		requestId.checkAndRemove(dto.getRequestId());
         keyUploaderCallback.handleCallback(dto.getStatus(), dto.getUser(), dto.getEdgeInfo());

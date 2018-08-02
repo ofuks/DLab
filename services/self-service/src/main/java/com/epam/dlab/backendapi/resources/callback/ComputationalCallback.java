@@ -20,14 +20,15 @@ import com.epam.dlab.auth.SystemUserInfoService;
 import com.epam.dlab.auth.UserInfo;
 import com.epam.dlab.backendapi.dao.ComputationalDAO;
 import com.epam.dlab.backendapi.domain.RequestId;
-import com.epam.dlab.dto.UserInstanceStatus;
 import com.epam.dlab.backendapi.service.ComputationalService;
 import com.epam.dlab.backendapi.service.ReuploadKeyService;
+import com.epam.dlab.dto.UserInstanceStatus;
 import com.epam.dlab.dto.computational.ComputationalStatusDTO;
 import com.epam.dlab.dto.computational.UserComputationalResource;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.model.ResourceData;
 import com.epam.dlab.rest.contracts.ApiCallbacks;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,6 +67,7 @@ public class ComputationalCallback {
     @POST
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(ComputationalStatusDTO dto) {
+		LoggerService.defineUser(dto.getUser());
 		log.debug("Updating status for computational resource {} for user {}: {}",
 				dto.getComputationalName(), dto.getUser(), dto);
         String uuid = dto.getRequestId();

@@ -29,6 +29,7 @@ import com.epam.dlab.dto.exploratory.ExploratoryStatusDTO;
 import com.epam.dlab.exceptions.DlabException;
 import com.epam.dlab.model.ResourceData;
 import com.epam.dlab.rest.contracts.ApiCallbacks;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,6 +73,7 @@ public class ExploratoryCallback {
 	@POST
 	@Path(ApiCallbacks.STATUS_URI)
 	public Response status(ExploratoryStatusDTO dto) {
+		LoggerService.defineUser(dto.getUser());
 		log.debug("Updating status for exploratory environment {} for user {} to {}",
 				dto.getExploratoryName(), dto.getUser(), dto.getStatus());
 		requestId.checkAndRemove(dto.getRequestId());

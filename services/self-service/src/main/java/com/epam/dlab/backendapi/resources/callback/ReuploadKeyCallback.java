@@ -19,6 +19,7 @@ package com.epam.dlab.backendapi.resources.callback;
 import com.epam.dlab.backendapi.domain.RequestId;
 import com.epam.dlab.backendapi.service.ReuploadKeyService;
 import com.epam.dlab.dto.reuploadkey.ReuploadKeyStatusDTO;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,6 +47,7 @@ public class ReuploadKeyCallback {
 	@POST
 	@Path("/callback")
 	public Response reuploadKeyResponse(ReuploadKeyStatusDTO dto) {
+		LoggerService.defineUser(dto.getUser());
 		requestId.remove(dto.getRequestId());
 		reuploadKeyService.updateResourceData(dto);
 		return Response.ok(uriInfo.getRequestUri()).build();

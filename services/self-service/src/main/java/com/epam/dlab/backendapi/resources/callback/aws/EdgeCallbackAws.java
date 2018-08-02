@@ -21,6 +21,7 @@ import com.epam.dlab.backendapi.resources.callback.base.EdgeCallback;
 import com.epam.dlab.dto.aws.edge.EdgeInfoAws;
 import com.epam.dlab.dto.base.keyload.UploadFileResult;
 import com.epam.dlab.rest.contracts.ApiCallbacks;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,6 +54,7 @@ public class EdgeCallbackAws extends EdgeCallback {
     @POST
     @Path(ApiCallbacks.STATUS_URI)
     public Response status(UploadFileResult<EdgeInfoAws> dto) {
+		LoggerService.defineUser(dto.getUser());
 		requestId.checkAndRemove(dto.getRequestId());
         handleEdgeCallback(dto.getUser(), dto.getStatus());
         return Response.ok().build();

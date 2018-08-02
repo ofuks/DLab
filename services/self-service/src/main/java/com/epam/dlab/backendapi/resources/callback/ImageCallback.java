@@ -22,6 +22,7 @@ import com.epam.dlab.dto.UserInstanceStatus;
 import com.epam.dlab.dto.exploratory.ImageCreateStatusDTO;
 import com.epam.dlab.dto.exploratory.ImageStatus;
 import com.epam.dlab.model.exloratory.Image;
+import com.epam.dlab.util.LoggerService;
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,6 +49,7 @@ public class ImageCallback {
 	@POST
 	@Path("/image_status")
 	public Response imageCreateStatus(ImageCreateStatusDTO dto) {
+		LoggerService.defineUser(dto.getUser());
 		log.debug("Updating status of image {} for user {} to {}", dto.getName(), dto.getUser(), dto);
 		requestId.remove(dto.getRequestId());
 		imageExploratoryService.finishImageCreate(getImage(dto), dto.getExploratoryName(), dto.getImageCreateDTO()
