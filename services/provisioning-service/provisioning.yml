@@ -87,14 +87,3 @@ logging:
       archive: true
       archivedLogFilenamePattern: ${LOG_ROOT_DIR}/ssn/provisioning-%d{yyyy-MM-dd}.log.gz
       archivedFileCount: 10
-    - type: gelf
-      logFormat: "%-5p [user:%X{user:-server}] [%d{ISO8601,UTC}] %c: %m%n%rEx"
-      host: 54.184.119.55
-      # port: 12201
-      # facility: MyApplication
-      # threshold: ALL
-      # originHost: my-shiny-host
-      extractStackTrace: true
-      filterStackTrace: true
-      includeFullMDC: true
-      includeLocation: true

@@ -69,11 +69,6 @@ limitations under the License.
             <version>${org.mockito.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>net.gini.dropwizard</groupId>
-            <artifactId>dropwizard-gelf</artifactId>
-            <version>1.3.0-1</version>
-        </dependency>
     </dependencies>
 
     <build>
