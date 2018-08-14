@@ -104,6 +104,14 @@ logging:
 <#if DEV_MODE == "true">
     - type: console
       logFormat: "%-5p [user:%X{user:-server}] [%d{ISO8601,UTC}] %c: %m%n%rEx"
+- type: gelf
+  host: udp:0.0.0.0
+  port: 12201
+  logFormat: "%-5p [user:%X{user:-server}] [%d{ISO8601,UTC}] %c: %m%n%rEx"
+  extractStackTrace: true
+  filterStackTrace: true
+  includeFullMDC: true
+  includeLocation: true
 </#if>
     - type: file
       logFormat: "%-5p [user:%X{user:-server}] [%d{ISO8601,UTC}] %c: %m%n%rEx"
