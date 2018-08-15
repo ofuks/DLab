@@ -302,6 +302,30 @@ def install_r_pkg(requisites):
     except:
         return "Fail to install R packages"
 
+def install_java_pkg(requisites):
+    status = list()
+    error_parser = "ERROR|error|No such|no such|Please run|requires"
+    try:
+        if not exists('/home/' + os_user + '/java_libs'):
+            run('mkdir /home/' + os_user + '/java_libs')
+        run('cd /home/' + os_user + '/java_libs')
+        for java_pkg in requisites:
+            splitted_pkg = java_pkg.split(":")
+            name_pkg = splitted_pkg[1] + '-' + splitted_pkg[2] + '.jar'
+            sudo('wget -O {3} https://search.maven.org/classic/remotecontent?filepath={0}/{1}/{2}/{3} 2>&1 | tee /tmp/tee.tmp; if ! grep -w -E  "({4})" /tmp/tee.tmp >  /tmp/install_{3}.log; then  echo "" > /tmp/install_{3}.log;fi'.format(splitted_pkg[0].replace(".","/"), splitted_pkg[1], splitted_pkg[2],name_pkg, error_parser))
+            sudo('ls -la | if ! grep -w {0} > /tmp/install_{0}.list; then  echo "" > /tmp/install_{0}.list;fi'.format(java_pkg))
+            sudo('jar tf {0} 2>&1 |if ! grep -w -E "({1})" > /tmp/install_{0}.list; then  echo "" > /tmp/install_{0}.list;fi'.format(name_pkg, error_parser))
+            err = sudo('cat /tmp/install_{0}.log'.format(name_pkg)).replace('"', "'")
+            res = sudo('cat /tmp/install_{0}.list'.format(name_pkg))
+            if res:
+                err+=' jar tf results:' + sudo('cat /tmp/install_{0}.list'.format(name_pkg))
+                status.append({"group": "java_pkg", "name": java_pkg, "status": "failed", "error_message": err})
+            else:
+                status.append({"group": "java_pkg", "name": splitted_pkg[0]+':'+splitted_pkg[1], "version": splitted_pkg[2], "status": "installed"})
+        return status
+    except:
+        return "Fail to install Java packages"
+
 def get_available_r_pkgs():
     try:
         r_pkgs = dict()
