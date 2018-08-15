@@ -35,20 +35,21 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ExploratoryLibList {
 
-	/**
+/**
 	 * Timeout in milliseconds when the info is out of date.
 	 */
-	private static final long EXPIRED_TIMEOUT_MILLIS = Duration.hours(2).toMilliseconds();
+	private static final long EXPIRED_TIMEOUT_MILLIS = Duration.minutes(3).toMilliseconds();
 
 	/**
 	 * Timeout in milliseconds until the is out of date.
 	 */
-	private static final long UPDATE_TIMEOUT_MILLIS = Duration.minutes(30).toMilliseconds();
+	private static final long UPDATE_TIMEOUT_MILLIS = Duration.minutes(2).toMilliseconds();
 
 	/**
 	 * Timeout in milliseconds for request to update lib.
 	 */
-	protected static final long UPDATE_REQUEST_TIMEOUT_MILLIS = Duration.minutes(15).toMilliseconds();
+	protected static final long UPDATE_REQUEST_TIMEOUT_MILLIS = Duration.minutes(1).toMilliseconds();
+
 
 	/**
 	 * Image name.
