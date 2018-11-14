@@ -15,6 +15,8 @@ CONTENTS
 
 [DLab Deployment](#DLab_Deployment)
 
+&nbsp; &nbsp; &nbsp; &nbsp; [Preparing environment for DLab deployment](#Env_for_DLab)
+
 &nbsp; &nbsp; &nbsp; &nbsp; [Structure of main DLab directory](#DLab_directory)
 
 &nbsp; &nbsp; &nbsp; &nbsp; [Structure of log directory](#log_directory)
@@ -151,6 +153,44 @@ That simplifies running big data frameworks, such as Apache Hadoop and Apache Sp
 ----------------------
 # DLab Deployment <a name="DLab_Deployment"></a>
 
+## Preparing environment for DLab deployment <a name="Env_for_DLab"></a>
+
+#### In Amazon cloud
+If you want to deploy DLab from inside of your AWS account, you can use the following instruction:
+
+- Create an EC2 instance with the following settings:
+    - Shape of the instance shouldn't be less than t2.medium
+    - The instance should have access to Internet in order to install required prerequisites 
+    - The instance should have access to further DLab installation
+    - AMI - Ubuntu 16.04
+    - IAM role with [policy](#AWS_SSN_policy) should be assigned to the instance
+- Connect to the instance via SSH and run the following commands:
+```
+    sudo su
+    apt-get update
+    apt-get install -y openjdk-8-jdk git wget unzip python-pip
+    cd /opt/ 
+    wget http://mirrors.sonic.net/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip
+    unzip apache-maven-3.5.4-bin.zip
+    mv apache-maven-3.5.4 maven
+    echo 'export M2_HOME=/opt/maven ' > /etc/profile.d/maven.sh
+    echo 'export PATH=${M2_HOME}/bin:${PATH}' >> /etc/profile.d/maven.sh
+    chmod +x /etc/profile.d/maven.sh
+    source /etc/profile.d/maven.sh
+    bash -c "curl --silent --location https://deb.nodesource.com/setup_8.x | bash -"
+    apt-get install -y nodejs
+    npm config set unsafe-perm=true
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    apt-get update
+    apt-cache policy docker-ce
+    apt-get install -y docker-ce=17.06.2~ce-0~ubuntu
+    usermod -a -G docker ubuntu
+    pip install fabric==1.14.0
+```
+- Clone DLab repository and run deploy script.
+
+
 ## Structure of main DLab directory <a name="DLab_directory"></a>
 
 DLab’s SSN node main directory structure is as follows:
@@ -206,62 +246,104 @@ Prerequisites:
  
  - SSH key for EC2 instances. This key could be created through Amazon Console.
  - IAM user
- - AWS access key ID and secret access key
+ - AWS access key ID and secret access key (if DLab won't be deployed from [prepared environment](#Env_for_DLab))
  - The following permissions should be assigned for IAM user:
+<a name="AWS_SSN_policy"></a>
 ```
 {
-	"Version": "2012-10-17",
-	"Statement": [
-		{
-			"Action": [
-				"iam:ListRoles",
-				"iam:CreateRole",
-				"iam:CreateInstanceProfile",
-				"iam:PutRolePolicy",
-				"iam:AddRoleToInstanceProfile",
-				"iam:PassRole",
-				"iam:GetInstanceProfile",
-				"iam:ListInstanceProfilesForRole"
-				"iam:RemoveRoleFromInstanceProfile",
-				"iam:DeleteInstanceProfile"
-			],
-			"Effect": "Allow",
-			"Resource": "*"
-		},
-		{
-			"Action": [
-				"ec2:DescribeImages",
-				"ec2:CreateTags",
-				"ec2:DescribeRouteTables",
-				"ec2:CreateRouteTable",
-				"ec2:AssociateRouteTable",
-				"ec2:DescribeVpcEndpoints",
-				"ec2:CreateVpcEndpoint",
-				"ec2:ModifyVpcEndpoint",
-				"ec2:DescribeInstances",
-				"ec2:RunInstances",
-				"ec2:DescribeAddresses",
-				"ec2:AllocateAddress",
-				"ec2:DescribeInstances",
-				"ec2:AssociateAddress",
-				"ec2:DisassociateAddress",
-				"ec2:ReleaseAddress",
-				"ec2:TerminateInstances"
-			],
-			"Effect": "Allow",
-			"Resource": "*"
-		},
-		{
-			"Action": [
-				"s3:ListAllMyBuckets",
-				"s3:CreateBucket",
-				"s3:PutBucketTagging",
-				"s3:GetBucketTagging"
-			],
-			"Effect": "Allow",
-			"Resource": "*"
-		}
-	]
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "iam:CreatePolicy",
+                "iam:AttachRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:DeletePolicy",
+                "iam:DeleteRolePolicy",
+                "iam:GetRolePolicy",
+                "iam:GetPolicy",
+                "iam:GetUser",
+                "iam:ListUsers",
+                "iam:ListAccessKeys",
+                "iam:ListUserPolicies",
+                "iam:ListAttachedRolePolicies",
+                "iam:ListPolicies",
+                "iam:ListRolePolicies",
+                "iam:ListRoles",
+                "iam:CreateRole",
+                "iam:CreateInstanceProfile",
+                "iam:PutRolePolicy",
+                "iam:AddRoleToInstanceProfile",
+                "iam:PassRole",
+                "iam:GetInstanceProfile",
+                "iam:ListInstanceProfilesForRole",
+                "iam:RemoveRoleFromInstanceProfile",
+                "iam:DeleteInstanceProfile",
+                "iam:ListInstanceProfiles",
+                "iam:DeleteRole",
+                "iam:GetRole"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Action": [
+                "ec2:AuthorizeSecurityGroupEgress",
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:DeleteRouteTable",
+                "ec2:DeleteSubnet",
+                "ec2:DeleteTags",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeInstanceStatus",
+                "ec2:ModifyInstanceAttribute",
+                "ec2:RevokeSecurityGroupIngress",
+                "ec2:DescribeImages",
+                "ec2:CreateTags",
+                "ec2:DescribeRouteTables",
+                "ec2:CreateRouteTable",
+                "ec2:AssociateRouteTable",
+                "ec2:DescribeVpcEndpoints",
+                "ec2:CreateVpcEndpoint",
+                "ec2:ModifyVpcEndpoint",
+                "ec2:DescribeInstances",
+                "ec2:RunInstances",
+                "ec2:DescribeAddresses",
+                "ec2:AllocateAddress",
+                "ec2:AssociateAddress",
+                "ec2:DisassociateAddress",
+                "ec2:ReleaseAddress",
+                "ec2:TerminateInstances",
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:AuthorizeSecurityGroupEgress",
+                "ec2:DescribeSecurityGroups",
+                "ec2:CreateSecurityGroup",
+                "ec2:DeleteSecurityGroup",
+                "ec2:RevokeSecurityGroupEgress"
+                
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Action": [
+                "s3:GetBucketLocation",
+                "s3:PutBucketPolicy",
+                "s3:GetBucketPolicy",
+                "s3:DeleteBucket",
+                "s3:DeleteObject",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:PutEncryptionConfiguration"
+                "s3:ListAllMyBuckets",
+                "s3:CreateBucket",
+                "s3:PutBucketTagging",
+                "s3:GetBucketTagging"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        }
+    ]
 }
 ```
 
