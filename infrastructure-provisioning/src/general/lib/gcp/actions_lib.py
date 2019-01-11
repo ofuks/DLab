@@ -483,6 +483,9 @@ class GCPActions:
                                                                        body=params)
         try:
             result = request.execute()
+            print('-----------------------------')
+            print(result)
+            print('-----------------------------')
             service_account_created = meta_lib.GCPMeta().get_service_account(service_account_name)
             while not service_account_created:
                 time.sleep(5)
