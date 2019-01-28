@@ -16,7 +16,7 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { Component, OnInit, EventEmitter, Output, ViewChild, ChangeDetectorRef, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, ViewChild, ChangeDetectorRef, ViewContainerRef, ElementRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastsManager } from 'ng2-toastr';
 
@@ -37,6 +37,7 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
   readonly PROVIDER = DICTIONARY.cloud_provider;
   readonly DICTIONARY = DICTIONARY;
   readonly CLUSTER_CONFIGURATION = CLUSTER_CONFIGURATION;
+  readonly CHECK = CheckUtils;
 
   model: ComputationalResourceCreateModel;
   notebook_instance: any;
@@ -62,9 +63,9 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
   @ViewChild('templatesList') templates_list;
   @ViewChild('masterShapesList') master_shapes_list;
   @ViewChild('shapesSlaveList') slave_shapes_list;
-  @ViewChild('spotInstancesCheck') spotInstancesSelect;
-  @ViewChild('preemptibleNode') preemptible;
-  @ViewChild('configurationNode') configuration;
+  @ViewChild('spotInstancesCheck') spotInstancesSelect: ElementRef;
+  @ViewChild('preemptibleNode') preemptible: ElementRef;
+  @ViewChild('configurationNode') configuration: ElementRef;
 
   @Output() buildGrid: EventEmitter<{}> = new EventEmitter();
 
@@ -84,25 +85,16 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
     this.bindDialog.onClosing = () => this.resetDialog();
   }
 
-  public isNumberKey($event): boolean {
-    const charCode = ($event.which) ? $event.which : $event.keyCode;
-    if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-      $event.preventDefault();
-      return false;
-    }
-    return true;
-  }
-
   public onUpdate($event): void {
     if ($event.model.type === 'template') {
-      this.model.setSelectedTemplate($event.model.index);
-      this.master_shapes_list.setDefaultOptions(this.model.selectedImage.shapes.resourcesShapeTypes,
-        this.shapePlaceholder(this.model.selectedImage.shapes.resourcesShapeTypes, 'description'), 'master_shape', 'description', 'json');
-      this.slave_shapes_list.setDefaultOptions(this.model.selectedImage.shapes.resourcesShapeTypes,
-        this.shapePlaceholder(this.model.selectedImage.shapes.resourcesShapeTypes, 'description'), 'slave_shape', 'description', 'json');
+      const list = this.model.selectedImage.shapes.resourcesShapeTypes;
 
-      this.shapes.master_shape = this.shapePlaceholder(this.model.selectedImage.shapes.resourcesShapeTypes, 'type');
-      this.shapes.slave_shape = this.shapePlaceholder(this.model.selectedImage.shapes.resourcesShapeTypes, 'type');
+      this.model.setSelectedTemplate($event.model.index);
+      this.master_shapes_list.setDefaultOptions(list, this.shapePlaceholder(list, 'description'), 'master_shape', 'description', 'json');
+      this.slave_shapes_list.setDefaultOptions(list, this.shapePlaceholder(list, 'description'), 'slave_shape', 'description', 'json');
+
+      this.shapes.master_shape = this.shapePlaceholder(list, 'type');
+      this.shapes.slave_shape = this.shapePlaceholder(list, 'type');
     }
     if ($event.model.type === 'cluster_type') {
       this.model.setSelectedClusterType($event.model.index);
@@ -281,12 +273,9 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
 
   private validInstanceNumberRange(control) {
     if (control && control.value)
-      if (DICTIONARY.cloud_provider === 'gcp' && this.model.selectedImage.image === 'docker.dlab-dataengine-service') {
+      if (DICTIONARY.cloud_provider === 'gcp' && this.model.selectedImage.image === 'docker.dlab-dataengine-service')
         this.validPreemptibleNumberRange();
-        return control.value >= this.minInstanceNumber && control.value <= this.maxInstanceNumber ? null : { valid: false };
-      } else {
-        return control.value >= this.minInstanceNumber && control.value <= this.maxInstanceNumber ? null : { valid: false };
-      }
+      return control.value >= this.minInstanceNumber && control.value <= this.maxInstanceNumber ? null : { valid: false };
   }
 
   private validPreemptibleRange(control) {
@@ -337,9 +326,10 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
   private setDefaultParams(): void {
     if (this.model.selectedImage && this.model.selectedImage.shapes) {
       this.filterShapes();
+      const list = this.model.selectedImage.shapes.resourcesShapeTypes;
       this.shapes = {
-        master_shape: this.shapePlaceholder(this.model.selectedImage.shapes.resourcesShapeTypes, 'type'),
-        slave_shape: this.shapePlaceholder(this.model.selectedImage.shapes.resourcesShapeTypes, 'type')
+        master_shape: this.shapePlaceholder(list, 'type'),
+        slave_shape: this.shapePlaceholder(list, 'type')
       };
       if (DICTIONARY.cloud_provider !== 'azure' && this.cluster_type) {
         this.cluster_type.setDefaultOptions(this.model.resourceImages,
@@ -348,10 +338,10 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
             this.templates_list.setDefaultOptions(this.model.templates,
               this.model.selectedItem.version, 'template', 'version', 'array');
       }
-      this.master_shapes_list && this.master_shapes_list.setDefaultOptions(this.model.selectedImage.shapes.resourcesShapeTypes,
-        this.shapePlaceholder(this.model.selectedImage.shapes.resourcesShapeTypes, 'description'), 'master_shape', 'description', 'json');
-        this.slave_shapes_list && this.slave_shapes_list.setDefaultOptions(this.model.selectedImage.shapes.resourcesShapeTypes,
-        this.shapePlaceholder(this.model.selectedImage.shapes.resourcesShapeTypes, 'description'), 'slave_shape', 'description', 'json');
+      this.master_shapes_list && this.master_shapes_list.setDefaultOptions(list,
+        this.shapePlaceholder(list, 'description'), 'master_shape', 'description', 'json');
+      this.slave_shapes_list && this.slave_shapes_list.setDefaultOptions(list,
+        this.shapePlaceholder(list, 'description'), 'slave_shape', 'description', 'json');
     }
   }
 
