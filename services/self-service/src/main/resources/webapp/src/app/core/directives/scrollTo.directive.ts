@@ -26,7 +26,7 @@ export class ScrollDirective {
   constructor(private elRef: ElementRef) {}
 
   @Input()
-  set scrollTo(condition) {
+  set scrollTo(condition: boolean) {
     if (condition) {
       const scrollable = this.elRef.nativeElement;
       scrollable.scrollIntoView(false);

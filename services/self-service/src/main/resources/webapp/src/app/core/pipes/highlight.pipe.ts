@@ -16,10 +16,9 @@ limitations under the License.
 
 ****************************************************************************/
 
-
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {PipeTransform, Pipe} from '@angular/core';
+import { PipeTransform, Pipe } from '@angular/core';
 
 @Pipe({ name: 'highlight' })
 export class HighLightPipe implements PipeTransform {
@@ -33,5 +32,4 @@ export class HighLightPipe implements PipeTransform {
   declarations: [HighLightPipe],
   exports: [HighLightPipe]
 })
-
 export class HighLightPipeModule { }

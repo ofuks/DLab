@@ -30,5 +30,4 @@ export * from './click-outside.directive';
   declarations: [ClickOutsideDirective, ScrollDirective],
   exports: [ClickOutsideDirective, ScrollDirective]
 })
-
 export class DirectivesModule { }

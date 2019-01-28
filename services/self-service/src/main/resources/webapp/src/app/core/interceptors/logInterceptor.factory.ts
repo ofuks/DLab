@@ -16,11 +16,15 @@ limitations under the License.
 
 ****************************************************************************/
 
-import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
-import { RouterModule, Router } from '@angular/router';
+import { XHRBackend, RequestOptions } from '@angular/http';
+import { Router } from '@angular/router';
 
 import { HttpInterceptor } from './httpInterceptor.service';
 
-export function LogInterceptorFactory(backend: XHRBackend, defaultOptions: RequestOptions, router: Router) {
-    return new HttpInterceptor(backend, defaultOptions, router);
+export function LogInterceptorFactory(
+  backend: XHRBackend,
+  defaultOptions: RequestOptions,
+  router: Router
+) {
+  return new HttpInterceptor(backend, defaultOptions, router);
 }

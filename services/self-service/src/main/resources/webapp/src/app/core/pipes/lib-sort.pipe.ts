@@ -18,12 +18,26 @@ limitations under the License.
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LineBreakPipe } from './replace-breaks.pipe';
+import { Pipe, PipeTransform } from '@angular/core';
 
+@Pipe({name: 'libStatusSort', pure: false})
+
+export class LibSortPipe implements PipeTransform {
+  transform(array: Array<Object>): Array<Object> {
+    const order = ['installing', 'installed', 'failed'];
+    array.sort((arg1: any, arg2: any) => {
+      if (arg1.status !== arg2.status)
+        return order.indexOf(arg1.status) - order.indexOf(arg2.status);
+      else
+        return arg1.name !== arg2.name ? arg1.name < arg2.name ? -1 : 1 : 0;
+    });
+    return array;
+  }
+}
 @NgModule({
   imports: [CommonModule],
-  declarations: [LineBreakPipe],
-  exports: [LineBreakPipe]
+  declarations: [LibSortPipe],
+  exports: [LibSortPipe]
 })
 
-export class LineBreaksPipeModule { }
+export class LibSortPipeModule { }

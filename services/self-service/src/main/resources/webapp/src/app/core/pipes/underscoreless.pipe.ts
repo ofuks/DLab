@@ -16,6 +16,8 @@ limitations under the License.
 
 ****************************************************************************/
 
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({ name: 'underscoreless' })
@@ -25,3 +27,10 @@ export class UnderscorelessPipe implements PipeTransform {
     return value.replace(/_/g, ' ');
   }
 }
+
+@NgModule({
+  imports: [CommonModule],
+  declarations: [UnderscorelessPipe],
+  exports: [UnderscorelessPipe]
+})
+export class UnderscorelessPipeModule { }

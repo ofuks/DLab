@@ -30,7 +30,7 @@ import { CostDetailsDialogModule } from '../billing/cost-details-dialog';
 import { InstallLibrariesModule } from '../exploratory/install-libraries';
 import { AmiCreateDialogModule } from '../exploratory/ami-create-dialog';
 import { SchedulerModule } from '../scheduler';
-import { UnderscorelessPipeModule } from '../../core/pipes/underscoreless-pipe';
+import { UnderscorelessPipeModule } from '../../core/pipes';
 
 export * from './resources-grid.component';
 export * from './resources-grid.model';
