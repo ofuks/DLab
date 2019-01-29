@@ -47,7 +47,6 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
   spotInstance: boolean = true;
   clusterNamePattern: string = '[-_a-zA-Z0-9]*[_-]*[a-zA-Z0-9]+';
   nodeCountPattern: string = '^[1-9]\\d*$';
-  delimitersRegex = /[-_]?/g;
 
   public minInstanceNumber: number;
   public maxInstanceNumber: number;
@@ -132,16 +131,12 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
         if (this.notebook_instance.name === this.full_list[index].name) {
           for (let iindex = 0; iindex < this.full_list[index].resources.length; iindex++) {
             const computational_name = this.full_list[index].resources[iindex].computational_name.toString().toLowerCase();
-            if (this.delimitersFiltering(conputational_resource_name) === this.delimitersFiltering(computational_name))
+            if (CheckUtils.delimitersFiltering(conputational_resource_name) === CheckUtils.delimitersFiltering(computational_name))
               return true;
           }
         }
       }
     return false;
-  }
-
-  public delimitersFiltering(resource): string {
-    return resource.replace(this.delimitersRegex, '').toString().toLowerCase();
   }
 
   public selectSpotInstances($event?): void {
@@ -271,57 +266,9 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
     }
   }
 
-  private validInstanceNumberRange(control) {
-    if (control && control.value)
-      if (DICTIONARY.cloud_provider === 'gcp' && this.model.selectedImage.image === 'docker.dlab-dataengine-service')
-        this.validPreemptibleNumberRange();
-      return control.value >= this.minInstanceNumber && control.value <= this.maxInstanceNumber ? null : { valid: false };
-  }
 
-  private validPreemptibleRange(control) {
-    if (this.preemptible)
-      return this.preemptible.nativeElement['checked']
-        ? (control.value !== null
-          && control.value >= this.minPreemptibleInstanceNumber
-          && control.value <= this.maxPreemptibleInstanceNumber ? null : { valid: false })
-        : control.value;
-  }
 
-  private validPreemptibleNumberRange() {
-    const instance_value = this.resourceForm.controls['instance_number'].value;
-    this.maxPreemptibleInstanceNumber = Math.max((this.maxInstanceNumber - instance_value), 0);
 
-    const value = this.resourceForm.controls['preemptible_instance_number'].value;
-    if (value !== null && value >= this.minPreemptibleInstanceNumber && value <= this.maxPreemptibleInstanceNumber) {
-      this.resourceForm.controls['preemptible_instance_number'].setErrors(null);
-    } else {
-      this.resourceForm.controls['preemptible_instance_number'].setErrors({ valid: false });
-    }
-  }
-
-  private validInstanceSpotRange(control) {
-    if (this.spotInstancesSelect)
-      return this.spotInstancesSelect.nativeElement['checked']
-        ? (control.value >= this.minSpotPrice && control.value <= this.maxSpotPrice ? null : { valid: false })
-        : control.value;
-  }
-
-  private validConfiguration(control) {
-    if (this.configuration)
-      return this.configuration.nativeElement['checked']
-        ? (control.value && control.value !== null && CheckUtils.isJSON(control.value) ? null : { valid: false })
-        : null;
-  }
-
-  private checkDuplication(control) {
-    if (this.containsComputationalResource(control.value))
-      return { duplication: true };
-  }
-
-  private providerMaxLength(control) {
-    if (DICTIONARY.cloud_provider !== 'aws')
-      return control.value.length <= 10 ? null : { valid: false };
-  }
 
   private setDefaultParams(): void {
     if (this.model.selectedImage && this.model.selectedImage.shapes) {
@@ -376,5 +323,58 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
 
     if (this.PROVIDER === 'gcp' && this.preemptible)
       this.preemptible.nativeElement['checked'] = false;
+  }
+
+  // Validation
+  private validInstanceSpotRange(control) {
+    if (this.spotInstancesSelect)
+      return this.spotInstancesSelect.nativeElement['checked']
+        ? (control.value >= this.minSpotPrice && control.value <= this.maxSpotPrice ? null : { valid: false })
+        : control.value;
+  }
+
+  private validConfiguration(control) {
+    if (this.configuration)
+      return this.configuration.nativeElement['checked']
+        ? (control.value && control.value !== null && CheckUtils.isJSON(control.value) ? null : { valid: false })
+        : null;
+  }
+
+  private checkDuplication(control) {
+    if (this.containsComputationalResource(control.value))
+      return { duplication: true };
+  }
+
+  private providerMaxLength(control) {
+    if (DICTIONARY.cloud_provider !== 'aws')
+      return control.value.length <= 10 ? null : { valid: false };
+  }
+
+  private validInstanceNumberRange(control) {
+    if (control && control.value)
+      if (DICTIONARY.cloud_provider === 'gcp' && this.model.selectedImage.image === 'docker.dlab-dataengine-service')
+        this.validPreemptibleNumberRange();
+      return control.value >= this.minInstanceNumber && control.value <= this.maxInstanceNumber ? null : { valid: false };
+  }
+
+  private validPreemptibleRange(control) {
+    if (this.preemptible)
+      return this.preemptible.nativeElement['checked']
+        ? (control.value !== null
+          && control.value >= this.minPreemptibleInstanceNumber
+          && control.value <= this.maxPreemptibleInstanceNumber ? null : { valid: false })
+        : control.value;
+  }
+
+  private validPreemptibleNumberRange() {
+    const instance_value = this.resourceForm.controls['instance_number'].value;
+    this.maxPreemptibleInstanceNumber = Math.max((this.maxInstanceNumber - instance_value), 0);
+
+    const value = this.resourceForm.controls['preemptible_instance_number'].value;
+    if (value !== null && value >= this.minPreemptibleInstanceNumber && value <= this.maxPreemptibleInstanceNumber) {
+      this.resourceForm.controls['preemptible_instance_number'].setErrors(null);
+    } else {
+      this.resourceForm.controls['preemptible_instance_number'].setErrors({ valid: false });
+    }
   }
 }

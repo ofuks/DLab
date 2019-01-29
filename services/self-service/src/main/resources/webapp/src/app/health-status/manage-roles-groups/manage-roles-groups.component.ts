@@ -20,6 +20,7 @@ import { Component, OnInit, ViewChild, Output, EventEmitter, Inject } from '@ang
 import { ValidatorFn, FormControl, NgModel } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DICTIONARY } from '../../../dictionary/global.dictionary';
+import { CheckUtils } from '../../core/util';
 
 @Component({
   selector: 'dlab-manage-roles-groups',
@@ -125,7 +126,7 @@ export class ManageRolesGroupsComponent implements OnInit {
 
     const duplicateList = this.groupsData.map(item => item.group);
     return <ValidatorFn>((control: FormControl) => {
-      if (control.value && duplicateList.includes(this.delimitersFiltering(control.value)))
+      if (control.value && duplicateList.includes(CheckUtils.delimitersFiltering(control.value)))
         return { duplicate: true };
 
       if (control.value && !this.groupnamePattern.test(control.value))
@@ -137,10 +138,6 @@ export class ManageRolesGroupsComponent implements OnInit {
 
   public compareObjects(o1: any, o2: any): boolean {
     return o1.toLowerCase() === o2.toLowerCase();
-  }
-
-  public delimitersFiltering(resource): string {
-    return resource.replace(this.delimitersRegex, '').toString().toLowerCase();
   }
 
   public resetDialog() {

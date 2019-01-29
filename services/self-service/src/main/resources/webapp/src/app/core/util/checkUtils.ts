@@ -17,6 +17,8 @@ limitations under the License.
 ****************************************************************************/
 
 export class CheckUtils {
+  static delimitersRegex = /[-_]?/g;
+
   public static isJSON(str) {
     try {
       JSON.parse(str);
@@ -33,5 +35,9 @@ export class CheckUtils {
       return false;
     }
     return true;
+  }
+
+  public static delimitersFiltering(resource): string {
+    return resource.replace(this.delimitersRegex, '').toLowerCase();
   }
 }

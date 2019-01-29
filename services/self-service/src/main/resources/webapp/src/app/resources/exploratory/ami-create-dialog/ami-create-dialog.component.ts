@@ -21,7 +21,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastsManager } from 'ng2-toastr';
 
 import { UserResourceService } from '../../../core/services';
-import { HTTP_STATUS_CODES } from '../../../core/util';
+import { HTTP_STATUS_CODES, CheckUtils} from '../../../core/util';
 import { DICTIONARY } from '../../../../dictionary/global.dictionary';
 
 @Component({
@@ -29,7 +29,7 @@ import { DICTIONARY } from '../../../../dictionary/global.dictionary';
   templateUrl: './ami-create-dialog.component.html',
   styleUrls: ['./ami-create-dialog.component.scss']
 })
-export class AmiCreateDialogComponent {
+export class AmiCreateDialogComponent implements OnInit {
   readonly DICTIONARY = DICTIONARY;
   public notebook: any;
   public createAMIForm: FormGroup;
@@ -75,7 +75,8 @@ export class AmiCreateDialogComponent {
           this.buildGrid.emit();
         }
       },
-      error => this.toastr.error(error.message || `${ DICTIONARY.image.toLocaleUpperCase() } creation failed!`, 'Oops!', { toastLife: 5000 }));
+      error => this.toastr.error(error.message
+        || `${ DICTIONARY.image.toLocaleUpperCase() } creation failed!`, 'Oops!', { toastLife: 5000 }));
   }
 
   private initFormModel(): void {
@@ -88,11 +89,7 @@ export class AmiCreateDialogComponent {
 
   private providerMaxLength(control) {
     if (DICTIONARY.cloud_provider !== 'aws')
-      return control.value.length <=10 ? null : { valid: false };
-  }
-
-  private delimitersFiltering(resource): string {
-    return resource.replace(this.delimitersRegex, '').toString().toLowerCase();
+      return control.value.length <= 10 ? null : { valid: false };
   }
 
   private checkDuplication(control) {
@@ -102,7 +99,7 @@ export class AmiCreateDialogComponent {
 
   private isDuplicate(value: string) {
     for (let index = 0; index < this.imagesList.length; index++) {
-      if (this.delimitersFiltering(value) === this.delimitersFiltering(this.imagesList[index].name))
+      if (CheckUtils.delimitersFiltering(value) === CheckUtils.delimitersFiltering(this.imagesList[index].name))
         return true;
     }
     return false;

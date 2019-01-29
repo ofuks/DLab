@@ -24,7 +24,7 @@ import { UserResourceService } from '../../core/services';
 import { ResourcesGridRowModel, FilterConfigurationModel, CreateResourceModel } from '.';
 import { GeneralEnvironmentStatus } from '../../health-status/health-status.module';
 import { ConfirmationDialogType } from '../../shared';
-import { SortUtil } from '../../core/util';
+import { SortUtil, CheckUtils } from '../../core/util';
 
 import { DICTIONARY } from '../../../dictionary/global.dictionary';
 
@@ -213,14 +213,10 @@ export class ResourcesGridComponent implements OnInit {
   containsNotebook(notebook_name: string): boolean {
     if (notebook_name)
       for (let index = 0; index < this.environments.length; index++)
-        if (this.delimitersFiltering(notebook_name) === this.delimitersFiltering(this.environments[index].name))
+        if (CheckUtils.delimitersFiltering(notebook_name) === CheckUtils.delimitersFiltering(this.environments[index].name))
           return true;
 
     return false;
-  }
-
-  public delimitersFiltering(notebook_name): string {
-    return notebook_name.replace(this.delimitersRegex, '').toString().toLowerCase();
   }
 
   loadEnvironments(exploratoryList: Array<any>, sharedDataList: any): Array<ResourcesGridRowModel> {
@@ -306,10 +302,5 @@ export class ResourcesGridComponent implements OnInit {
     } else if (action === 'ami') {
       this.createAMI.open({ isFooter: false }, data);
     }
-  }
-
-  dropdownPosition($event): void {
-    const contentHeight = document.body.offsetHeight > window.outerHeight ? document.body.offsetHeight : window.outerHeight;
-    this.isOutscreenDropdown = $event.pageY + 285 > contentHeight ? true : false;
   }
 }
