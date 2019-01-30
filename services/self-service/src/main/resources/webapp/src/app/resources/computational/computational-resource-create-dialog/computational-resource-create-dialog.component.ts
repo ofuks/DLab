@@ -125,13 +125,13 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
     return false;
   }
 
-  public containsComputationalResource(conputational_resource_name: string): boolean {
-    if (conputational_resource_name)
+  public containsComputationalResource(cluster: string): boolean {
+    if (cluster)
       for (let index = 0; index < this.full_list.length; index++) {
         if (this.notebook_instance.name === this.full_list[index].name) {
           for (let iindex = 0; iindex < this.full_list[index].resources.length; iindex++) {
             const computational_name = this.full_list[index].resources[iindex].computational_name.toString().toLowerCase();
-            if (CheckUtils.delimitersFiltering(conputational_resource_name) === CheckUtils.delimitersFiltering(computational_name))
+            if (CheckUtils.delimitersFiltering(cluster) === CheckUtils.delimitersFiltering(computational_name))
               return true;
           }
         }
@@ -141,18 +141,17 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
 
   public selectSpotInstances($event?): void {
     if ($event ? $event.target.checked : this.spotInstancesSelect.nativeElement['checked']) {
-      const filtered = this.filterAvailableSpots();
+      const spots = this.filterAvailableSpots();
 
-      this.slave_shapes_list.setDefaultOptions(filtered, this.shapePlaceholder(filtered, 'description'),
-        'slave_shape', 'description', 'json');
-      this.shapes.slave_shape = this.shapePlaceholder(filtered, 'type');
+      this.slave_shapes_list.setDefaultOptions(spots, this.shapePlaceholder(spots, 'description'), 'slave_shape', 'description', 'json');
+      this.shapes.slave_shape = this.shapePlaceholder(spots, 'type');
 
-      this.spotInstance = this.shapePlaceholder(filtered, 'spot');
+      this.spotInstance = this.shapePlaceholder(spots, 'spot');
       this.resourceForm.controls['instance_price'].setValue(50);
     } else {
-      this.slave_shapes_list.setDefaultOptions(this.model.selectedImage.shapes.resourcesShapeTypes,
-        this.shapePlaceholder(this.model.selectedImage.shapes.resourcesShapeTypes, 'description'), 'slave_shape', 'description', 'json');
-      this.shapes.slave_shape = this.shapePlaceholder(this.model.selectedImage.shapes.resourcesShapeTypes, 'type');
+      const list = this.model.selectedImage.shapes.resourcesShapeTypes;
+      this.slave_shapes_list.setDefaultOptions(list, this.shapePlaceholder(list, 'description'), 'slave_shape', 'description', 'json');
+      this.shapes.slave_shape = this.shapePlaceholder(list, 'type');
 
       this.spotInstance = false;
       this.resourceForm.controls['instance_price'].setValue(0);
@@ -243,19 +242,21 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
 
   private getComputationalResourceLimits(): void {
     if (this.model.availableTemplates && this.model.selectedImage && this.model.selectedImage.image) {
-      const activeImage = DICTIONARY[this.model.selectedImage.image];
+      const image = this.model.selectedImage.image;
+      const activeImage = DICTIONARY[image];
+      const limits = this.model.selectedImage.limits;
 
-      this.minInstanceNumber = this.model.selectedImage.limits[activeImage.total_instance_number_min];
-      this.maxInstanceNumber = this.model.selectedImage.limits[activeImage.total_instance_number_max];
+      this.minInstanceNumber = limits[activeImage.total_instance_number_min];
+      this.maxInstanceNumber = limits[activeImage.total_instance_number_max];
 
-      if (DICTIONARY.cloud_provider === 'gcp' && this.model.selectedImage.image === 'docker.dlab-dataengine-service') {
-        this.maxInstanceNumber = this.model.selectedImage.limits[activeImage.total_instance_number_max] - 1;
-        this.minPreemptibleInstanceNumber = this.model.selectedImage.limits.min_dataproc_preemptible_instance_count;
+      if (DICTIONARY.cloud_provider === 'gcp' && image === 'docker.dlab-dataengine-service') {
+        this.maxInstanceNumber = limits[activeImage.total_instance_number_max] - 1;
+        this.minPreemptibleInstanceNumber = limits.min_dataproc_preemptible_instance_count;
       }
 
-      if (DICTIONARY.cloud_provider === 'aws' && this.model.selectedImage.image === 'docker.dlab-dataengine-service') {
-        this.minSpotPrice = this.model.selectedImage.limits.min_emr_spot_instance_bid_pct;
-        this.maxSpotPrice = this.model.selectedImage.limits.max_emr_spot_instance_bid_pct;
+      if (DICTIONARY.cloud_provider === 'aws' && image === 'docker.dlab-dataengine-service') {
+        this.minSpotPrice = limits.min_emr_spot_instance_bid_pct;
+        this.maxSpotPrice = limits.max_emr_spot_instance_bid_pct;
 
         this.spotInstancesSelect.nativeElement['checked'] = true;
         this.selectSpotInstances();
@@ -265,9 +266,6 @@ export class ComputationalResourceCreateDialogComponent implements OnInit {
       this.resourceForm.controls['preemptible_instance_number'].setValue(this.minPreemptibleInstanceNumber);
     }
   }
-
-
-
 
 
   private setDefaultParams(): void {
